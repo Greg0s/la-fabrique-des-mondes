@@ -17,11 +17,24 @@ let __SETTINGS__ = {
 	distanceScale: 60
 };
 
-let __POINTS__ = [];
-let __STARTPOSITION__ = undefined;
+class TSPEnvironment {
+	/**
+	 * Bundle class for a complete environment for
+	 * the Travelling Salesman Problem.
+	 * @param {THREE.Vector3[]} points 
+	 */
+	constructor() {
+		this.start = randomPoint();
+		this.init();
+	}
 
-let _anchor = new THREE.Object3D();
-let _lights = new THREE.Object3D();
+	init() {
+		this.points = []; // Avoids duplicates in later generations
+		for (let i = 0; i < __SETTINGS__.pointsCount; i++) {
+			this.points[i] = randomPoint();
+		}
+	}
+}
 
 /**
  * Represents a Path in the Travelling Salesman Problem.
@@ -33,22 +46,27 @@ class Path {
 	/**
 	 *
 	 * @param {number[]} pointIndex ordered point index
+	 * @param {TSPEnvironment} env
 	 */
-	constructor(pointIndex) {
+	constructor(pointIndex, env) {
 		this.pointIndex = pointIndex;
+		this.env = env;
 		this.score = this.computeScore();
 	}
 
+	/**
+	 * @returns {number} the length of the path
+	 */
 	length() {
 		let total = 0.0;
 
 		for (let i = 0; i < this.pointIndex.length - 1; i++) {
-			total += __POINTS__[this.pointIndex[i]].distanceTo(__POINTS__[this.pointIndex[i + 1]]);
+			total += this.env.points[this.pointIndex[i]].distanceTo(this.env.points[this.pointIndex[i + 1]]);
 		}
 
 		// add start and end distance parts of the path, connecting with the starting position
-		total += __STARTPOSITION__.distanceTo(__POINTS__[this.pointIndex[0]]);
-		total += __STARTPOSITION__.distanceTo(__POINTS__[this.pointIndex[this.pointIndex.length - 1]]);
+		total += this.env.start.distanceTo(this.env.points[this.pointIndex[0]]);
+		total += this.env.start.distanceTo(this.env.points[this.pointIndex[this.pointIndex.length - 1]]);
 
 		return total;
 	}
@@ -102,7 +120,7 @@ class Path {
 			[newPath[pickA], newPath[pickB]] = [newPath[pickB], newPath[pickA]];
 		}
 
-		return new Path(newPath);
+		return new Path(newPath, this.env);
 	}
 
 	/**
@@ -132,7 +150,7 @@ class Path {
 		}
 
 
-		return new Path(offspring);
+		return new Path(offspring, this.env);
 	}
 }
 
@@ -202,39 +220,29 @@ function roll(weights, excludeIndex = -1) {
 
 	// It shouldn't be here normally, but we need to return properly something
 	// Here's an uniform roll.
-	return Math.floor(Math.random() * __POINTS__.length);
+	return Math.floor(Math.random() * __SETTINGS__.populationMax);
 }
 
-const api = {
-	settings: __SETTINGS__,
+class TSP {
+	constructor() {
+		this.settings = __SETTINGS__;
+		this.environment = new TSPEnvironment();
+		this.startPosition = randomPoint();
 
-	start: function () {
-		this.init();
-		this.generate();
-	},
+		this.anchor = new THREE.Object3D();
+		this.lights = new THREE.Object3D();
 
-	stop: function() {
-		this.stopFlag = true;
-	},
-
-	/**
-	 * Initializes the TSP genetic algorithm.
-	 */
-	init: function () {
 		this.stopFlag = false;
 
 		if (__SETTINGS__.pointsCount < 1) {
 			throw new RangeError('Path.generate: Cannot generate 0 points or less. Number given: ' + __SETTINGS__.pointsCount);
 		}
 
-		// Points
-		__POINTS__ = []; // Avoids duplicates in later generations
-		for (let i = 0; i < __SETTINGS__.pointsCount; i++) {
-			__POINTS__[i] = randomPoint();
-		}
+		this.setup();
+	}
 
-		__STARTPOSITION__ = randomPoint();
-		_lights.children = [];
+	setup() {
+		this.lights.children = [];
 
 		const simpleSphere = new THREE.SphereGeometry(0.5, 8, 8);
 
@@ -246,16 +254,24 @@ const api = {
 					new THREE.MeshBasicMaterial({ color: _color })
 				));
 			pointLight.position.copy(position);
-			_lights.add(pointLight);
+			this.lights.add(pointLight);
 		};
 
-		for (let i = 0; i < __POINTS__.length; i++) {
-			createCity(__POINTS__[i], __SETTINGS__.pointColor);
+		for (let i = 0; i < this.environment.points.length; i++) {
+			createCity(this.environment.points[i], __SETTINGS__.pointColor);
 		}
-		createCity(__STARTPOSITION__, 0xff0000);
-	},
+		createCity(this.environment.start, 0xff0000);
+	}
 
-	anchor: _anchor,
+	reset() {
+		this.environment.init();
+		this.setup();
+		this.generate();
+	}
+
+	stop() {
+		this.stopFlag = true;
+	}
 
 	/**
 	 * Returns a (hopefully) good solution to the Travelling Salesman problem
@@ -263,7 +279,7 @@ const api = {
 	 * @todo Currently a blocking call function
 	 * @return {Path}
 	 */
-	generate: async function (generations = 50) {
+	async generate(generations = 50) {
 		if (this.stopFlag) {
 			this.stopFlag = false;
 		}
@@ -273,7 +289,7 @@ const api = {
 		let array = initArray(__SETTINGS__.pointsCount);
 
 		for (let i = 0; i < __SETTINGS__.populationMax; i++) {
-			population[i] = new Path(shuffleArray(array)); // generate path
+			population[i] = new Path(shuffleArray(array), this.environment); // generate path
 		}
 
 		/**
@@ -297,7 +313,7 @@ const api = {
 			population = population.slice(0, __SETTINGS__.populationMax);
 
 			// Render best path
-			api.render(population[0].pointIndex); // TODO
+			this.render(population[0].pointIndex); // TODO
 
 			// Parent selection
 			const numberCrossovers = __SETTINGS__.crossFrequency * population.length;
@@ -324,49 +340,30 @@ const api = {
 		await step(generations);
 
 		return population[0];
-	},
+	}
 
 	/**
 	 * Creates the objects 
 	 * @param {number[]} orderedIndex 
 	 */
-	render: function (orderedIndex) {
-		_anchor.children = [];
+	render(orderedIndex) {
+		this.anchor.children = [];
 
-		_anchor.add(_lights);
+		this.anchor.add(this.lights);
 
-		// for (let i = 0; i < orderedIndex.length - 1; i++) {
-		// 	let pointLight = new THREE.PointLight(0xFFFFFF, 3);
-
-		// 	let distance = __POINTS__[orderedIndex[i]].distanceTo(__POINTS__[orderedIndex[i + 1]]);
-		// 	let geometry = new THREE.CylinderGeometry(0.2, 0.2, distance, 20, 32);
-		// 	let material = new THREE.MeshPhongMaterial({ color: 0xaaaaaa });
-		// 	let mesh = new THREE.Mesh(geometry, material);
-		// 	pointLight.add(mesh);
-
-		// 	let midPoint = new THREE.Vector3(0, 0, 0)
-		// 		.addVectors(__POINTS__[orderedIndex[i]], __POINTS__[orderedIndex[i + 1]])
-		// 		.divideScalar(2);
-		// 	pointLight.position.copy(midPoint);
-		// 	pointLight.lookAt(__POINTS__[orderedIndex[i+1]]);
-		// 	_anchor.add(pointLight);
-		// }
-
-		const points = [__STARTPOSITION__];
+		const points = [this.environment.start];
 
 		for (let i = 0; i < orderedIndex.length; i++) {
-			points.push(__POINTS__[orderedIndex[i]]);
+			points.push(this.environment.points[orderedIndex[i]]);
 		}
 
-		points.push(__STARTPOSITION__);
+		points.push(this.environment.start);
 
 		const geometry = new THREE.BufferGeometry().setFromPoints(points);
 		const material = new THREE.LineDashedMaterial({ color: 0xffffff });
 		const line = new THREE.Line(geometry, material);
-		_anchor.add(line);
+		this.anchor.add(line);
 	}
-};
+}
 
-export default api;
-// eslint-disable-next-line no-undef
-// module.exports = api;
+export default TSP;
