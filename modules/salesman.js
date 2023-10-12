@@ -182,6 +182,10 @@ function initArray(size) {
 	return [...Array(size).keys()];
 }
 
+/**
+ * 
+ * @returns {THREE.Vector3} a point with x, y, z between -0.5 and 5
+ */
 function randomPoint() {
 	return new THREE.Vector3(
 		Math.random() - 0.5,
@@ -193,7 +197,7 @@ function randomPoint() {
 /**
  * @param {number[]} weights an array of (5) weights that sum to 1
  * @param {number} excludeIndex an index we don't want to end up on
- * @return an index selected with a weight
+ * @returns an index selected with a weight
  * If the supposed returned value is excludeIndex, the current implementation
  * returns a neighboring valid index.
  */
