@@ -21,15 +21,18 @@ class TSPEnvironment {
 	/**
 	 * Bundle class for a complete environment for
 	 * the Travelling Salesman Problem.
-	 * @param {THREE.Vector3[]} points 
 	 */
 	constructor() {
+		/** @type {THREE.Vector3} */
 		this.start = randomPoint();
+
 		this.init();
 	}
 
 	init() {
+		/** @type {THREE.Vector3[]} */
 		this.points = []; // Avoids duplicates in later generations
+
 		for (let i = 0; i < __SETTINGS__.pointsCount; i++) {
 			this.points[i] = randomPoint();
 		}
@@ -49,8 +52,13 @@ class Path {
 	 * @param {TSPEnvironment} env
 	 */
 	constructor(pointIndex, env) {
+		/** @type {number[]} */
 		this.pointIndex = pointIndex;
+
+		/** @type {TSPEnvironment} */
 		this.env = env;
+
+		/** @type {number} */
 		this.score = this.computeScore();
 	}
 
@@ -154,6 +162,11 @@ class Path {
 	}
 }
 
+/**
+ * 
+ * @param {Array} array 
+ * @returns 
+ */
 function shuffleArray(array) {
 	// Create a copy of the original array to avoid modifying the input array
 	const newArray = array.slice();
@@ -230,12 +243,20 @@ function roll(weights, excludeIndex = -1) {
 class TSP {
 	constructor() {
 		this.settings = __SETTINGS__;
+
+		/** @type {TSPEnvironment} */
 		this.environment = new TSPEnvironment();
+
+		/** @type {THREE.Vector3} */
 		this.startPosition = randomPoint();
 
+		/** @type {THREE.Object3D} */
 		this.anchor = new THREE.Object3D();
+
+		/** @type {THREE.Object3D} */
 		this.lights = new THREE.Object3D();
 
+		/** @type {boolean} */
 		this.stopFlag = false;
 
 		if (__SETTINGS__.pointsCount < 1) {
