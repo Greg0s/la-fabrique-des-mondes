@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 
-
 class Sponge {
 	constructor() {
 		this.anchor = new THREE.Object3D();
@@ -20,16 +19,11 @@ class Sponge {
 			// This shit is maybe optimized mesh.
 			// https://threejs.org/manual/#en/optimize-lots-of-objects
 			const initialGeometry = new THREE.BoxGeometry(size, size, size);
-			// let positionHelper = new THREE.Object3D();
-			// positionHelper.add(this.anchor);
-
-			// // positionHelper.position.copy(position);
-			// this.anchor.updateWorldMatrix(true, false);
-			// initialGeometry.applyMatrix4(this.anchor.matrixWorld);
-			//geometries.push(initialGeometry);
-			let mesh = new THREE.Mesh(initialGeometry, new THREE.MeshPhongMaterial({color: 0x404040}));
+			let mesh = new THREE.Mesh(initialGeometry);
+			
 			mesh.position.copy(position);
-			this.anchor.add(mesh);
+			// this.anchor.add(mesh);
+			geometries.push(mesh);
 			return;
 		}
 
@@ -76,17 +70,21 @@ class Sponge {
 		const geometries = [];
 		this.#create(geometries, new THREE.Vector3(), 1, depth);
 
-		// console.log(geometries);
+		console.log(geometries);
 
-		// let mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries, false);
+		// Thank you bro
+		// https://stackoverflow.com/questions/70643562/three-js-how-to-pre-position-objects-to-merge
+		let mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries.map(b => {
+			b.updateMatrixWorld(); // needs to be done to be sure that all transformations are applied
+			return b.geometry.applyMatrix4(b.matrixWorld);
+		}), false);
 
-		// console.log(mergedGeometry);
+		console.log(mergedGeometry);
 
-		// this.anchor.add(
-		// 	new THREE.Mesh(
-		// 		mergedGeometry,
-		// 		new THREE.MeshBasicMaterial({ color: 0x404040 }))
-		// );
+		let mesh = new THREE.Mesh(
+			mergedGeometry,
+			new THREE.MeshPhongMaterial({ color: 0x404040 }));
+		this.anchor.add(mesh);
 	}
 }
 
