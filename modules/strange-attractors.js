@@ -1,14 +1,13 @@
 import * as THREE from "three";
 
-const __SETTINGS__ = {
-  dt: 0.005,
-  positions: [],
-  colors: [],
-};
-
 class StrangeAttractor {
   constructor() {
-    this.settings = __SETTINGS__;
+    this.settings = {
+      dt: 0.005,
+      positions: [],
+      colors: [],
+    };
+
     this.x = 0.1;
     this.y = 0;
     this.z = 0;
@@ -16,7 +15,8 @@ class StrangeAttractor {
     this.lineGeometry = new THREE.BufferGeometry();
     this.anchor = new THREE.Object3D();
 
-    this.setup();
+    const lineMaterial = new THREE.LineBasicMaterial({ vertexColors: true });
+    this.line = new THREE.Line(this.lineGeometry, lineMaterial);
   }
 
   /**
@@ -49,12 +49,6 @@ class StrangeAttractor {
     );
 
     this.anchor.add(this.line);
-  }
-
-  setup() {
-    const lineMaterial = new THREE.LineBasicMaterial({ vertexColors: true });
-
-    this.line = new THREE.Line(this.lineGeometry, lineMaterial);
   }
 
   /**
