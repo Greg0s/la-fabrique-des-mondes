@@ -108,9 +108,11 @@ class FitnessLandscape {
         new THREE.Float32BufferAttribute(facesVertices, 3)
       );
 
-      const materialFaces = new THREE.PointsMaterial({
+      // Calculate normals for the geometry
+      facesGeometry.computeVertexNormals();
+
+      const materialFaces = new THREE.MeshPhongMaterial({
         color: this.settings.materialFacesColor,
-        size: 0.1,
       });
 
       materialFaces.side = THREE.DoubleSide;

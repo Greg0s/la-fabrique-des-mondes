@@ -97,8 +97,10 @@ class SierpinskiTriangle {
       "position",
       new THREE.BufferAttribute(vertices, itemSize)
     );
+    // Calculate normals for the geometry
+    geometry.computeVertexNormals();
 
-    const material = new THREE.MeshBasicMaterial({ color: color });
+    const material = new THREE.MeshPhongMaterial({ color: color });
     material.side = THREE.DoubleSide; // to see the mesh from both ways
     const mesh = new THREE.Mesh(geometry, material);
 
