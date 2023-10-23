@@ -162,30 +162,25 @@ class Boid {
 }
 
 class BoidEnvironment {
-	constructor() {
+	/**
+	 * @param {THREE.Mesh} mesh a mesh copied to each boid created
+	 */
+	constructor(mesh) {
 		/** @type {Boid[]} */
 		this.boids = [];
 
-		/** @type {*} */
-		this.obstacles = [];
-
-		/**
-		 * @type {THREE.Object3D}
-		 * @todo link mesh to this anchor or something
-		 */
+		/** @type {THREE.Object3D} */
 		this.anchor = new THREE.Object3D();
+
+		/** @type {THREE.Mesh} */
+		this.mesh = mesh;
 	}
 
 	create() {
-		let geometry = new THREE.ConeGeometry(0.1, 0.2, 8, 8);
-		let material = new THREE.MeshBasicMaterial({ color: 0xaaaa00 });
-
 		this.boids = [];
 
-		// TODO add boids in anchor
-		// TODO manage their movement (actual boid & cone displayed)
 		for (let i = 0; i < settings.BOID_COUNT; ++i) {
-			let boid = new Boid(tools.randomPoint(), new THREE.Mesh(geometry, material));
+			let boid = new Boid(tools.randomPoint(), this.mesh);
 			this.boids.push(boid);
 			this.anchor.add(boid.mesh);
 		}
