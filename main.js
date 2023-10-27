@@ -1,8 +1,35 @@
 import * as THREE from "three";
+// Three modules import
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { TransformControls } from "three/addons/controls/TransformControls.js";
+// External dependencies
 import { GUI } from "dat.gui";
+// Internal dependencies
+import {
+  Sponge,
+  FitnessLandscape,
+  StrangeAttractor,
+  SierpinskiTriangle,
+} from "/modules";
+import { UI, intersectionHandler } from "/utils";
 
-// Création de la scène
+// UI creation
+const body = document.querySelector("body");
+const ui = new UI();
+// TODO: complete UI
+const items = [
+  {
+    name: "Strange Attractor",
+    function: createAttractor,
+  },
+  {
+    name: "Menger Sponge",
+  },
+];
+
+ui.createBar(items, body);
+
+// Scene creation
 var scene = new THREE.Scene();
 scene.background = new THREE.Color("lightblue");
 
@@ -17,14 +44,37 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.append(renderer.domElement);
 
 // OrbitControls initialization
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.1;
-controls.rotateSpeed = 0.5;
+let orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true;
+orbit.dampingFactor = 0.1;
+orbit.rotateSpeed = 0.5;
 
+// TransformControls
+let control = new TransformControls(camera, renderer.domElement);
+scene.add(control);
+
+let raycaster;
+let INTERSECTED;
+
+control.addEventListener("dragging-changed", function (event) {
+  orbit.enabled = !event.value;
+});
+
+// Hover handler
+const pointer = new THREE.Vector2();
+
+function onPointerMove(event) {
+  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+
+// Scene functions
 function init() {
   window.addEventListener("resize", onResize, false);
   renderer.setSize(window.innerWidth, window.innerHeight);
+
+  raycaster = new THREE.Raycaster();
+  document.addEventListener("mousemove", onPointerMove);
 }
 
 function onResize() {
@@ -39,7 +89,7 @@ function onResize() {
 let ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
-let pointLight = new THREE.PointLight(0xffff00, 5);
+let pointLight = new THREE.PointLight(0xffff00, 50);
 scene.add(pointLight);
 
 // Scene
@@ -52,24 +102,7 @@ const gui = new GUI();
 // Add a folder: it is a dropdown button
 const cameraPositionFolder = gui.addFolder("Camera");
 
-// It adds inside the folder a modifiable field
-// Here it is the z coordinate of the camera.
-//
-// Params:
-// 1 - An object (camera.position).
-// It needs to have different fields which is the case here (x, y, z).
-// 2 - The field of the object given in -1-.
-// It has to exist in the given object.
-//
-// For a slider, add two more values :
-// 3 - min value
-// 4 - max value
-// 5 - optional: step (smallest increment possible), default: 0.1
 cameraPositionFolder.add(camera.position, "z", 0, 20);
-
-// You can open the folder by default with: folderName.open();
-// Ex: cameraPositionFolder.open();
-
 const treeFolder = gui.addFolder("Tree");
 
 // You can also add folders inside a folder.
@@ -80,9 +113,61 @@ treeRotationFolder.add(tree.rotation, "z", 0, Math.PI * 2);
 
 // Create an animation loop
 const animate = () => {
-  renderer.render(scene, camera);
+  // renderer.render(scene, camera);
   requestAnimationFrame(animate);
+  render();
 };
+
+function render() {
+  // add controls to intersected objects
+  raycaster.setFromCamera(pointer, camera);
+  INTERSECTED = intersectionHandler(scene, control, raycaster);
+
+  // render
+  renderer.render(scene, camera);
+}
+
+// Add cube for testing
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshLambertMaterial({
+  color: 0xffffff,
+});
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
+
+function createAttractor() {
+  let lorenz = new StrangeAttractor();
+  lorenz.instantDraw("lorenz", 10000);
+  lorenz.anchor.scale.set(0.05, 0.05, 0.05);
+  scene.add(lorenz.anchor);
+}
+
+// Add attractor
+let aizawa = new StrangeAttractor();
+aizawa.instantDraw("aizawa", 10000);
+// scene.add(aizawa.anchor);
+
+// Add fitness landscape
+let mountains = new FitnessLandscape();
+mountains.geneticAlgorithmWithAdaptiveLandscape(400, 200, 0.1);
+mountains.anchor.scale.set(0.1, 0.1, 0.1);
+// scene.add(mountains.anchor);
+
+// Add Sierpinski triangle
+const triangle = new SierpinskiTriangle();
+triangle.generate3dSierpinski();
+triangle.anchor.scale.set(0.1, 0.1, 0.1);
+triangle.anchor.castShadow = true; // For objects that cast shadows
+triangle.anchor.receiveShadow = true; // For objects that receive shadows
+triangle.anchor.translateX(-1);
+triangle.anchor.translateZ(-1);
+triangle.anchor.translateY(-0.5);
+// scene.add(triangle.anchor);
+
+// Add Menger Sponge
+const sponge = new Sponge();
+sponge.create(2);
+scene.add(sponge.anchor);
 
 init();
 animate();
