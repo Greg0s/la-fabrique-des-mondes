@@ -1,0 +1,21 @@
+:root {
+  --color-primary: darkblue;
+  --color-seconday: purple; }
+
+body {
+  margin: 0;
+  font-family: sans-serif; }
+
+.ui {
+  display: flex;
+  gap: 2rem; }
+  .ui li {
+    list-style: none;
+    background-color: var(--color-primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: 0.3s ease; }
+    .ui li:hover {
+      opacity: 0.8; }
