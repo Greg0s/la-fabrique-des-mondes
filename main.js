@@ -28,11 +28,12 @@ const items = [
   },
 ];
 
+ui.createHeader(body);
 ui.createBar(items, body);
 
 // Scene creation
 var scene = new THREE.Scene();
-scene.background = new THREE.Color("lightblue");
+scene.background = new THREE.Color(0xE6E6FA);
 
 var camera = new THREE.PerspectiveCamera(
   75,

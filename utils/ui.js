@@ -1,7 +1,10 @@
 class UI {
   constructor() {
-    this.htmlElement = document.createElement("ul");
-    this.htmlElement.className = "ui";
+    this.bottomBar = document.createElement("ul");
+    this.bottomBar.className = "ui";
+
+    this.headerBar=document.createElement("div");
+    this.headerBar.className="header";
   }
 
   createBar(items, body) {
@@ -11,11 +14,20 @@ class UI {
       newItem.addEventListener("click", function () {
         item.function();
       });
-      this.htmlElement.appendChild(newItem);
+      this.bottomBar.appendChild(newItem);
     });
 
-    body.appendChild(this.htmlElement);
+    body.appendChild(this.bottomBar);
+  }
+
+  createHeader(body){
+    const myTitle = document.createElement("h1");
+    myTitle.innerHTML="My Generative World";
+    this.headerBar.appendChild(myTitle);
+    body.appendChild(this.headerBar);
   }
 }
+
+
 
 export default UI;
