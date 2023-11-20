@@ -24,6 +24,7 @@ const items = [
   },
   {
     name: "Menger Sponge",
+    function: createMengerSponge,
   },
 ];
 
@@ -133,13 +134,21 @@ const material = new THREE.MeshLambertMaterial({
   color: 0xffffff,
 });
 const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+// scene.add(cube);
 
 function createAttractor() {
-  let lorenz = new StrangeAttractor();
+  const lorenz = new StrangeAttractor();
   lorenz.instantDraw("lorenz", 10000);
   lorenz.anchor.scale.set(0.05, 0.05, 0.05);
   scene.add(lorenz.anchor);
+}
+
+function createMengerSponge() {
+  // Add Menger Sponge
+  const sponge = new Sponge(control);
+  sponge.create(2);
+  scene.add(sponge.anchor);
+  scene.add(sponge.hitbox.mesh);
 }
 
 // Add attractor
@@ -163,11 +172,6 @@ triangle.anchor.translateX(-1);
 triangle.anchor.translateZ(-1);
 triangle.anchor.translateY(-0.5);
 // scene.add(triangle.anchor);
-
-// Add Menger Sponge
-const sponge = new Sponge();
-sponge.create(2);
-scene.add(sponge.anchor);
 
 init();
 animate();
