@@ -5,6 +5,7 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { iterate } from "./lsystem.js";
+import { Hitbox } from "../utils";
 
 function assignExisting(target, source) {
   Object.keys(source)
@@ -20,13 +21,11 @@ const defaults = Object.freeze({
 });
 
 /**
-   * 
-   * @param {number} iterations 
-   * @param {THREE.Camera} camera 
-   * @param {THREE.OrbitControls} controls 
-   * @returns 
-   */
-export function Sakura(iterations, camera, controls) {
+ *
+ * @param {number} iterations
+ * @returns
+ */
+export function Sakura(iterations, control) {
   let data = {
     axiom: "m{0x594d30, 0.9, 0} A{0.2}",
     productions:
@@ -34,11 +33,7 @@ export function Sakura(iterations, camera, controls) {
   };
 
   let turtle = new Turtle();
-  turtle.generate(
-    iterate(data.axiom, data.productions, iterations),
-    camera,
-    controls
-  );
+  turtle.generate(iterate(data.axiom, data.productions, iterations), control);
 
   return turtle;
 }
@@ -394,7 +389,7 @@ export class Turtle {
     }
   }
 
-  generate(commands, camera, controls) {
+  generate(commands, control) {
     this.setDefaults(Turtle.defaults);
 
     this.reset();
@@ -408,8 +403,9 @@ export class Turtle {
     const target = new THREE.Vector3();
     aabb.getCenter(target);
     target.setX(0);
-    camera.position.set(0, target.y, -15);
-    controls.target.copy(target);
-    controls.update();
+
+    // Create hitbox & link to mesh
+    this.hitbox = new Hitbox();
+    this.hitbox.handler(control, this.hitbox.mesh, this.anchor);
   }
 }
