@@ -1,7 +1,8 @@
 import * as THREE from "three";
+import { Hitbox } from "../utils";
 
 class FitnessLandscape {
-  constructor() {
+  constructor(control) {
     this.settings = {
       colors: [],
       gridSize: 20,
@@ -12,6 +13,8 @@ class FitnessLandscape {
       factor: 2,
     };
     this.anchor = new THREE.Object3D();
+
+    this.control = control;
   }
 
   /**
@@ -134,6 +137,10 @@ class FitnessLandscape {
     materialLines.side = THREE.DoubleSide;
     const fitnessLines = new THREE.LineSegments(linesGeometry, materialLines);
     this.anchor.add(fitnessLines);
+
+    // Create hitbox & link to mesh
+    this.hitbox = new Hitbox();
+    this.hitbox.handler(this.control, this.hitbox.mesh, this.anchor);
   }
 
   createPoints(population, vertices) {
