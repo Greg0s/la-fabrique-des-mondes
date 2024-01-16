@@ -1,12 +1,15 @@
 import * as THREE from "three";
+import { Hitbox } from "../utils";
 
 class StrangeAttractor {
-  constructor() {
+  constructor(control) {
     this.settings = {
       dt: 0.005,
       positions: [],
       colors: [],
     };
+
+    this.control = control;
 
     this.x = 0.1;
     this.y = 0;
@@ -15,8 +18,8 @@ class StrangeAttractor {
     this.lineGeometry = new THREE.BufferGeometry();
     this.anchor = new THREE.Object3D();
 
-    const lineMaterial = new THREE.LineBasicMaterial({ vertexColors: true });
-    this.line = new THREE.Line(this.lineGeometry, lineMaterial);
+    this.lineMaterial = new THREE.LineBasicMaterial({ vertexColors: true });
+    this.line = new THREE.Line(this.lineGeometry, this.lineMaterial);
   }
 
   /**
@@ -48,7 +51,36 @@ class StrangeAttractor {
       new THREE.Float32BufferAttribute(this.settings.colors, 3)
     );
 
-    this.anchor.add(this.line);
+    const lineMesh = new THREE.Line(this.lineGeometry, this.lineMaterial);
+    this.anchor.add(lineMesh);
+
+    const shape = new THREE.Shape();
+    const points = this.lineGeometry.attributes.position.array;
+    for (let i = 0; i < points.length; i += 3) {
+      shape.lineTo(points[i], points[i + 1]);
+    }
+
+    // Extrude the line geometry to create a mesh
+    const extrudeSettings = {
+      depth: 20, // Set the depth of the extrusion
+      bevelEnabled: false,
+    };
+    const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+    // Create a mesh material
+    const material = new THREE.MeshBasicMaterial({
+      transparent: true,
+      opacity: 0,
+    });
+
+    // Create a mesh
+    const mesh = new THREE.Mesh(geometry, material);
+
+    this.anchor.add(mesh);
+
+    // Create hitbox & link to mesh
+    this.hitbox = new Hitbox();
+    this.hitbox.handler(this.control, this.hitbox.mesh, this.anchor);
   }
 
   /**
