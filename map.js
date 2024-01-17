@@ -1,6 +1,16 @@
 import * as THREE from "three";
-import { GUI } from "dat.gui";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { TransformControls } from "three/addons/controls/TransformControls.js";
+
+// MODULES
+import {
+  Sponge,
+  FitnessLandscape,
+  StrangeAttractor,
+  SierpinskiTriangle,
+  TSP,
+  Sakura,
+} from "/modules";
 
 let camera, scene, renderer;
 let plane;
@@ -19,7 +29,12 @@ const params = {
   toggleMode: toggleMode,
 };
 
-let mode = "addBlock";
+let mode = "edit";
+
+let selectedObject = "attractor";
+let selectedAttractor = "lorenz";
+
+let control;
 
 /* END ADDED PARAMS*/
 
@@ -27,9 +42,8 @@ init();
 render();
 
 function toggleMode() {
-  mode = mode === "addBlock" ? "moveCamera" : "addBlock";
-  mode == "addBlock" ? scene.add(rollOverMesh) : scene.remove(rollOverMesh);
-  console.log("Mode actuel :", mode);
+  mode = mode === "edit" ? "view" : "edit";
+  mode == "edit" ? scene.add(rollOverMesh) : scene.remove(rollOverMesh);
 }
 
 function init() {
@@ -44,11 +58,6 @@ function init() {
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf0f0f0);
-
-  // Contrôles dat.GUI
-  const gui = new GUI();
-
-  gui.add(params, "toggleMode").name("Toggle Mode");
 
   // roll-over helpers
 
@@ -112,18 +121,48 @@ function init() {
   document.addEventListener("keydown", onDocumentKeyDown);
   document.addEventListener("keyup", onDocumentKeyUp);
 
-  //
+  // Moving camera
 
   let orbit = new OrbitControls(camera, renderer.domElement);
   orbit.enableDamping = true;
   orbit.dampingFactor = 0.1;
   orbit.rotateSpeed = 0.5;
 
+  // TransformControls
+
+  control = new TransformControls(camera, renderer.domElement);
+  scene.add(control);
+
+  // UI listeners
+
+  document.querySelectorAll(".selectObject").forEach((item) => {
+    item.addEventListener("click", function () {
+      changeSelectedObject(item.value);
+    });
+  });
+
+  document
+    .querySelector(".selectAttractor")
+    .addEventListener("change", function (e) {
+      selectedAttractor = e.target.value;
+    });
+
+  document.querySelector(".selectMode").addEventListener("click", function (e) {
+    toggleMode();
+    if (mode == "view") e.target.innerHTML = "View mode";
+    else if (mode == "edit") e.target.innerHTML = "Edit mode";
+  });
+
   //
 
   window.addEventListener("resize", onWindowResize);
 
   animate();
+}
+
+function changeSelectedObject(object) {
+  console.log(object);
+  selectedObject = object;
 }
 
 function onWindowResize() {
@@ -136,7 +175,7 @@ function onWindowResize() {
 }
 
 function onPointerMove(event) {
-  if (mode == "addBlock") {
+  if (mode == "edit") {
     pointer.set(
       (event.clientX / window.innerWidth) * 2 - 1,
       -(event.clientY / window.innerHeight) * 2 + 1
@@ -169,7 +208,7 @@ function onPointerDown(event) {
 
   raycaster.setFromCamera(pointer, camera);
 
-  if (mode === "addBlock") {
+  if (mode === "edit") {
     // Logique d'ajout de blocs
     const intersects = raycaster.intersectObjects(objects, false);
 
@@ -182,20 +221,12 @@ function onPointerDown(event) {
           objects.splice(objects.indexOf(intersect.object), 1);
         }
       } else {
-        const voxel = new THREE.Mesh(cubeGeo, cubeMaterial);
-        voxel.position.copy(intersect.point).add(intersect.face.normal);
-        voxel.position
-          .divideScalar(50)
-          .floor()
-          .multiplyScalar(50)
-          .addScalar(25);
-        scene.add(voxel);
-        objects.push(voxel);
+        addObject(intersect);
       }
 
       render();
     }
-  } else if (mode === "moveCamera") {
+  } else if (mode === "view") {
     // Logique de déplacement de la caméra
     const deltaX = event.movementX || event.mozMovementX || 0;
     const deltaY = event.movementY || event.mozMovementY || 0;
@@ -207,6 +238,61 @@ function onPointerDown(event) {
 
     // updateCamera();
   }
+}
+
+function addObject(intersect) {
+  let object;
+  let scaleFactor = 50;
+
+  switch (selectedObject) {
+    case "sponge":
+      object = new Sponge(control);
+      object.create(2);
+      object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      object = placeObject(object, intersect, true);
+      break;
+
+    case "attractor":
+      object = new StrangeAttractor(control);
+      object.instantDraw(selectedAttractor, 10000);
+      object = placeObject(object, intersect, true);
+      break;
+
+    case "tree":
+      object = Sakura(4, control);
+      scene.add(object.group);
+      scaleFactor = scaleFactor / 2;
+      object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      object = placeObject(object, intersect, true);
+      break;
+
+    case "fitness-landscape":
+      object = new FitnessLandscape(control);
+      object.geneticAlgorithmWithAdaptiveLandscape(400, 200, 0.1);
+      scaleFactor /= 10;
+      object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      object = placeObject(object, intersect, false);
+      break;
+  }
+
+  scene.add(object.anchor);
+  objects.push(object.anchor);
+}
+
+function placeObject(object, intersect, isCentered) {
+  // If operations are inverted, object can be placed anywhere, not only 1 per square
+
+  object.anchor.position.copy(intersect.point).add(intersect.face.normal);
+
+  if (isCentered) {
+    object.anchor.position
+      .divideScalar(50)
+      .floor()
+      .multiplyScalar(50)
+      .addScalar(25);
+  }
+
+  return object;
 }
 
 function onDocumentKeyDown(event) {
