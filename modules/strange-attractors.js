@@ -4,7 +4,7 @@ import { Hitbox } from "../utils";
 class StrangeAttractor {
   constructor(control) {
     this.settings = {
-      dt: 0.005,
+      dt: 0.01,
       positions: [],
       colors: [],
     };
@@ -102,9 +102,9 @@ class StrangeAttractor {
       const a = 0.2,
         b = 0.2,
         c = 5.7;
-      dx = (-this.y - this.z) * this.settings.dt;
-      dy = (this.x + a * this.y) * this.settings.dt;
-      dz = (b + this.z * (this.x - c)) * this.settings.dt;
+      dx = (-this.y - this.z) * 0.015;
+      dy = (this.x + a * this.y) * 0.015;
+      dz = (b + this.z * (this.x - c)) * 0.015;
     } else if (name == "aizawa") {
       const a = 0.95,
         b = 0.7,
@@ -136,25 +136,22 @@ class StrangeAttractor {
         b = 1.2,
         c = 1;
 
-      dx = a * this.y * this.z * this.settings.dt;
-      dy = (this.x - b * this.y) * this.settings.dt;
-      dz = (c - this.x * this.y) * this.settings.dt;
+      const dt = 0.015;
+      dx = a * this.y * this.z * dt;
+      dy = (this.x - b * this.y) * dt;
+      dz = (c - this.x * this.y) * dt;
     } else if (name == "sprottLinzF") {
       const a = 0.5;
-      dx = (this.y + this.z) * this.settings.dt;
-      dy = (-this.x + a * this.y) * this.settings.dt;
-      dz = (Math.pow(this.x, 2) - this.z) * this.settings.dt;
+      const dt = 0.015;
+      dx = (this.y + this.z) * dt;
+      dy = (-this.x + a * this.y) * dt;
+      dz = (Math.pow(this.x, 2) - this.z) * dt;
     } else if (name == "halvorsen") {
       const a = 1.4;
-      dx =
-        (-a * this.x - 4 * this.y - 4 * this.z - this.y * this.y) *
-        this.settings.dt;
-      dy =
-        (-a * this.y - 4 * this.z - 4 * this.x - this.z * this.z) *
-        this.settings.dt;
-      dz =
-        (-a * this.z - 4 * this.x - 4 * this.y - this.x * this.x) *
-        this.settings.dt;
+      const dt = 0.005;
+      dx = (-a * this.x - 4 * this.y - 4 * this.z - this.y * this.y) * dt;
+      dy = (-a * this.y - 4 * this.z - 4 * this.x - this.z * this.z) * dt;
+      dz = (-a * this.z - 4 * this.x - 4 * this.y - this.x * this.x) * dt;
     }
 
     return { dx, dy, dz };
