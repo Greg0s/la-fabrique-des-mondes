@@ -282,6 +282,14 @@ function addObject(intersect) {
       object = placeObject(object, intersect, true);
       object.anchor.position.y = 0;
       break;
+
+    case "tsp":
+      object = new TSP();
+      object.generate();
+      object.anchor.position.y = Math.random() * 400 + 500;
+      scaleFactor = scaleFactor / 3;
+      object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      break;
   }
 
   scene.add(object.anchor);
