@@ -12,6 +12,7 @@ import {
   TSP,
   Sakura,
 } from "/modules";
+import { getAttractorParams } from "./utils/attractors";
 
 let camera, scene, renderer;
 let plane;
@@ -141,7 +142,7 @@ function init() {
 
   document.querySelectorAll(".selectObject").forEach((item) => {
     item.addEventListener("click", function () {
-      changeSelectedObject(item.value);
+      selectedObject = item.value;
     });
   });
 
@@ -166,11 +167,6 @@ function init() {
   window.addEventListener("resize", onWindowResize);
 
   animate();
-}
-
-function changeSelectedObject(object) {
-  console.log(object);
-  selectedObject = object;
 }
 
 function onWindowResize() {
@@ -244,25 +240,6 @@ function removeObject() {
   }
 }
 
-function getAttractorParams() {
-  switch (selectedAttractor) {
-    case "lorenz":
-      return { loopNb: 10000, scale: 5 };
-    case "rossler":
-      return { loopNb: 10000, scale: 10 };
-    case "aizawa":
-      return { loopNb: 15000, scale: 50 };
-    case "arneodo":
-      return { loopNb: 15000, scale: 10 };
-    case "sprottB":
-      return { loopNb: 20000, scale: 15 };
-    case "sprottLinzF":
-      return { loopNb: 15000, scale: 30 };
-    case "halvorsen":
-      return { loopNb: 10000, scale: 10 };
-  }
-}
-
 function addObject(intersect) {
   let object;
   let scaleFactor = 50;
@@ -277,7 +254,7 @@ function addObject(intersect) {
 
     case "attractor":
       object = new StrangeAttractor(control);
-      const { loopNb, scale } = getAttractorParams();
+      const { loopNb, scale } = getAttractorParams(selectedAttractor);
       object.instantDraw(selectedAttractor, loopNb);
       object.anchor.scale.set(scale, scale, scale);
       object = placeObject(object, intersect, true);
