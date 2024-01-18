@@ -1,56 +1,64 @@
 /* Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Vina+Sans&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Vina+Sans&display=swap");
 
 :root {
   --color-dark-blue: darkblue;
   --color-purple: purple;
-  --color-pink : #cf89f2;
-  --color-temp-bg:#E6E6FA;
-  --color-white:#ffffff;
- }
+  --color-pink: #cf89f2;
+  --color-temp-bg: #e6e6fa;
+  --color-white: #ffffff;
+}
 
 body {
   margin: 0;
   font-family: sans-serif;
 }
 
-.ui {
+.bottomBar {
   display: flex;
   gap: 2rem;
-  background-color:var(--color-pink);
+  background-color: var(--color-pink);
   position: absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  height:2.5rem;
-  margin:auto;
-  padding:1rem;
-  }
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2.5rem;
+  margin: auto;
+  padding: 1rem;
+}
 
-  .ui li {
-    list-style: none;
-    background-color: var(--color-dark-blue);
-    color: var(--color-temp-bg);
-    padding: 0.5rem 1rem;
-    border-radius: 1rem;
-    cursor: pointer;
-    transition: 0.3s ease; }
-    .ui li:hover {
-      opacity: 0.8; }
+.bottomBar li {
+  list-style: none;
+  outline: none;
+}
 
-.header{
-  background-color:var(--color-pink);
+.bottomBar button {
+  background-color: var(--color-dark-blue);
+  color: var(--color-temp-bg);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+  border: none;
+}
+.bottomBar button:hover {
+  opacity: 0.8;
+}
+
+.header {
+  background-color: var(--color-pink);
   position: absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:2.5rem;
-  margin:auto;
-  padding:1rem;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2.5rem;
+  margin: auto;
+  padding: 1rem;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   color: var(--color-white);
-  font-family: 'Vina Sans', sans-serif;
-  font-size: 2rem;}
+  font-family: "Vina Sans", sans-serif;
+  font-size: 2rem;
+}
