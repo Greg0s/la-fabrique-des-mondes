@@ -16,8 +16,7 @@ import {
 let camera, scene, renderer;
 let plane;
 let pointer,
-  raycaster,
-  isShiftDown = false;
+  raycaster = false;
 
 let rollOverMesh, rollOverMaterial;
 let cubeGeo, cubeMaterial;
@@ -65,7 +64,7 @@ function init() {
 
   const rollOverGeo = new THREE.BoxGeometry(50, 50, 50);
   rollOverMaterial = new THREE.MeshBasicMaterial({
-    color: 0xff0000,
+    color: 0xcf89f2,
     opacity: 0.5,
     transparent: true,
   });
@@ -245,6 +244,25 @@ function removeObject() {
   }
 }
 
+function getAttractorParams() {
+  switch (selectedAttractor) {
+    case "lorenz":
+      return { loopNb: 10000, scale: 5 };
+    case "rossler":
+      return { loopNb: 10000, scale: 10 };
+    case "aizawa":
+      return { loopNb: 15000, scale: 50 };
+    case "arneodo":
+      return { loopNb: 15000, scale: 10 };
+    case "sprottB":
+      return { loopNb: 20000, scale: 15 };
+    case "sprottLinzF":
+      return { loopNb: 15000, scale: 30 };
+    case "halvorsen":
+      return { loopNb: 10000, scale: 10 };
+  }
+}
+
 function addObject(intersect) {
   let object;
   let scaleFactor = 50;
@@ -259,8 +277,14 @@ function addObject(intersect) {
 
     case "attractor":
       object = new StrangeAttractor(control);
-      object.instantDraw(selectedAttractor, 10000);
+      const { loopNb, scale } = getAttractorParams();
+      object.instantDraw(selectedAttractor, loopNb);
+      object.anchor.scale.set(scale, scale, scale);
       object = placeObject(object, intersect, true);
+      object.anchor.position.y = Math.random() * (500 - 200) + 200;
+      object.anchor.rotation.x = Math.random() * Math.PI * 2;
+      object.anchor.rotation.y = Math.random() * Math.PI * 2;
+
       break;
 
     case "tree":
@@ -268,15 +292,18 @@ function addObject(intersect) {
       scene.add(object.group);
       scaleFactor = scaleFactor / 2;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      object = placeObject(object, intersect, true);
+      object = placeObject(object, intersect, false);
+      object.anchor.rotation.y = Math.random() * Math.PI * 2;
+
       break;
 
     case "fitness-landscape":
       object = new FitnessLandscape(control);
       object.geneticAlgorithmWithAdaptiveLandscape(400, 200, 0.1);
-      scaleFactor /= 10;
+      scaleFactor /= 8.5;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      object = placeObject(object, intersect, false);
+      object = placeObject(object, intersect, true);
+      object.anchor.position.y = 0;
       break;
   }
 
