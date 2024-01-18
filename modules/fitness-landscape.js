@@ -5,12 +5,12 @@ class FitnessLandscape {
   constructor(control) {
     this.settings = {
       colors: [],
-      gridSize: 20,
+      gridSize: 10,
       vertices: new Float32Array(20 * 20 * 3),
       materialFacesColor: 0x84,
       targetValue: 0.5,
-      landscapeNb: 10,
-      factor: 2,
+      landscapeNb: 1,
+      factor: 25,
     };
     this.anchor = new THREE.Object3D();
 
@@ -152,8 +152,11 @@ class FitnessLandscape {
         const index = i * gridSize + j;
         if (index < population.length) {
           const fitness = population[index].fitness;
+          let y;
+          if (i == 0 || i == gridSize - 1 || j == 0 || j == gridSize - 1) y = 0;
+          else y = fitness * this.settings.factor;
           vertices[index * 3] = x;
-          vertices[index * 3 + 1] += fitness * this.settings.factor;
+          vertices[index * 3 + 1] += y;
           vertices[index * 3 + 2] = z;
         }
       }
