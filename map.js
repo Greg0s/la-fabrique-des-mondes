@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
+import { saveScreenshot } from "/utils";
 
 // MODULES
 import {
@@ -22,6 +23,7 @@ let rollOverMesh, rollOverMaterial;
 let cubeGeo, cubeMaterial;
 
 const objects = [];
+const interactableObjects = [];
 
 /* ADDED PARAMS*/
 
@@ -111,7 +113,10 @@ function init() {
   directionalLight.position.set(1, 0.75, 0.5).normalize();
   scene.add(directionalLight);
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({
+    antialias: true,
+    preserveDrawingBuffer: true,
+  });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
@@ -151,6 +156,10 @@ function init() {
     toggleMode();
     if (mode == "view") e.target.innerHTML = "View mode";
     else if (mode == "edit") e.target.innerHTML = "Edit mode";
+  });
+
+  document.querySelector(".screenshot").addEventListener("click", function () {
+    saveScreenshot(renderer);
   });
 
   //
@@ -209,34 +218,30 @@ function onPointerDown(event) {
   raycaster.setFromCamera(pointer, camera);
 
   if (mode === "edit") {
-    // Logique d'ajout de blocs
-    const intersects = raycaster.intersectObjects(objects, false);
+    const intersects = raycaster.intersectObjects(objects);
 
-    if (intersects.length > 0) {
-      const intersect = intersects[0];
-
-      if (isShiftDown) {
-        if (intersect.object !== plane) {
-          scene.remove(intersect.object);
-          objects.splice(objects.indexOf(intersect.object), 1);
-        }
-      } else {
+    if (event.button === 0) {
+      // Left click to add
+      if (intersects.length > 0) {
+        const intersect = intersects[0];
         addObject(intersect);
+        render();
       }
+    } else if (event.button === 2) {
+      // Right click to remove last object
+      scene.remove(interactableObjects[intersects.length - 1]);
+      removeObject(interactableObjects[intersects.length - 1]);
 
       render();
     }
-  } else if (mode === "view") {
-    // Logique de déplacement de la caméra
-    const deltaX = event.movementX || event.mozMovementX || 0;
-    const deltaY = event.movementY || event.mozMovementY || 0;
+  }
+}
 
-    console.log("mode mouse");
+function removeObject() {
+  const objectToRemove = interactableObjects.pop(); // take last added object
 
-    // Ajustez les valeurs selon votre besoin
-    params.rotationAngle += deltaX * 0.005;
-
-    // updateCamera();
+  if (objectToRemove) {
+    scene.remove(objectToRemove);
   }
 }
 
@@ -276,7 +281,7 @@ function addObject(intersect) {
   }
 
   scene.add(object.anchor);
-  objects.push(object.anchor);
+  interactableObjects.push(object.anchor);
 }
 
 function placeObject(object, intersect, isCentered) {
