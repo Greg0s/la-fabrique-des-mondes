@@ -6,6 +6,41 @@
     <link rel="stylesheet" type="text/css" href="styles/ui.css" />
   </head>
   <body>
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="map.js"></script>
+    <div class="ui">
+      <div class="header">
+        <h1>Generative world</h1>
+        <button class="screenshot">Screenshot</button>
+        <button class="selectMode">Edit mode</button>
+      </div>
+      <ul class="bottomBar">
+        <li>
+          <button class="selectObject" value="sponge">Sponge</button>
+        </li>
+        <li>
+          <button class="selectObject" value="attractor">
+            Attracteur de
+            <select class="selectAttractor">
+              <option value="lorenz" selected>Lorenz</option>
+              <option value="rossler">Rossler</option>
+              <option value="aizawa">Aizawa</option>
+              <option value="arneodo">Arneodo</option>
+              <option value="sprottB">Sprott B 3</option>
+              <option value="sprottLinzF">Sprott Linz B</option>
+              <option value="halvorsen">Halvorsen</option>
+            </select>
+          </button>
+        </li>
+        <li>
+          <button class="selectObject" value="fitness-landscape">
+            Fitness landscape
+          </button>
+        </li>
+        <li>
+          <button class="selectObject" value="tree">Tree</button>
+        </li>
+        <li>TSP</li>
+      </ul>
+    </div>
   </body>
 </html>
