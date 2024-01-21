@@ -8,10 +8,9 @@ import {
   Sponge,
   FitnessLandscape,
   StrangeAttractor,
-  SierpinskiTriangle,
   TSP,
   Sakura,
-  Wolfram,
+  Ground,
 } from "/modules";
 import { getAttractorParams } from "./utils/attractors";
 
@@ -21,7 +20,6 @@ let pointer,
   raycaster = false;
 
 let rollOverMesh, rollOverMaterial;
-let cubeGeo, cubeMaterial;
 
 const objects = [];
 const interactableObjects = [];
@@ -71,14 +69,9 @@ function init() {
 
   // ground
 
-  const gridHelper = new THREE.GridHelper(1000, 20);
-  scene.add(gridHelper);
-
-  const sierpinski = new SierpinskiTriangle();
-  sierpinski.generate2dSierpinski();
-  scene.add(sierpinski.anchor);
-
-  ground();
+  const ground = new Ground();
+  ground.buildGround();
+  scene.add(ground.anchor);
 
   //
 
@@ -327,18 +320,4 @@ function render() {
 function animate() {
   requestAnimationFrame(animate);
   render();
-}
-
-function ground() {
-  wolfram();
-}
-
-function wolfram() {
-  const wolfram = new Wolfram();
-  wolfram.generate();
-  scene.add(wolfram.anchor);
-  wolfram.anchor.position.x = -475;
-  wolfram.anchor.position.y = -1;
-  wolfram.anchor.position.z = 475;
-  wolfram.anchor.rotation.x = Math.PI / 2;
 }
