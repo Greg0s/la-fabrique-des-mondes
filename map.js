@@ -11,6 +11,7 @@ import {
   SierpinskiTriangle,
   TSP,
   Sakura,
+  Wolfram,
 } from "/modules";
 import { getAttractorParams } from "./utils/attractors";
 
@@ -26,10 +27,6 @@ const objects = [];
 const interactableObjects = [];
 
 /* ADDED PARAMS*/
-
-const params = {
-  toggleMode: toggleMode,
-};
 
 let mode = "edit";
 
@@ -72,21 +69,16 @@ function init() {
   rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
   scene.add(rollOverMesh);
 
-  // cubes
-
-  const map = new THREE.TextureLoader().load(
-    "textures/square-outline-textured.png"
-  );
-  map.colorSpace = THREE.SRGBColorSpace;
-  cubeGeo = new THREE.BoxGeometry(50, 50, 50);
-  cubeMaterial = new THREE.MeshLambertMaterial({
-    color: 0xfeb74c,
-  });
-
-  // grid
+  // ground
 
   const gridHelper = new THREE.GridHelper(1000, 20);
   scene.add(gridHelper);
+
+  const sierpinski = new SierpinskiTriangle();
+  sierpinski.generate2dSierpinski();
+  scene.add(sierpinski.anchor);
+
+  ground();
 
   //
 
@@ -335,4 +327,18 @@ function render() {
 function animate() {
   requestAnimationFrame(animate);
   render();
+}
+
+function ground() {
+  wolfram();
+}
+
+function wolfram() {
+  const wolfram = new Wolfram();
+  wolfram.generate();
+  scene.add(wolfram.anchor);
+  wolfram.anchor.position.x = -475;
+  wolfram.anchor.position.y = -1;
+  wolfram.anchor.position.z = 475;
+  wolfram.anchor.rotation.x = Math.PI / 2;
 }
