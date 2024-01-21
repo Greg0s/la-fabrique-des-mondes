@@ -2,14 +2,15 @@ import * as THREE from "three";
 import { faces } from "./sierpinski-triangles-faces.js";
 
 class SierpinskiTriangle {
-  constructor() {
+  constructor(color) {
     // Constructor for the SierpinskiTriangle class.
     // Initializes settings and anchor for rendering.
 
     this.settings = {
-      depth: 3,
+      depth: Math.floor(2 + Math.random() * 2), // random value between 2 and 4
     };
 
+    this.color = color;
     this.anchor = new THREE.Object3D();
   }
 
@@ -32,7 +33,7 @@ class SierpinskiTriangle {
   generateSierpinski(vertices, depth) {
     if (depth === 0) {
       // We arrived at the defined depth, we can draw the triangles
-      this.drawVertices(vertices, getRandomColor());
+      this.drawVertices(vertices);
     } else {
       const v0 = [vertices[0], vertices[1], vertices[2]];
       const v1 = [vertices[3], vertices[4], vertices[5]];
@@ -84,13 +85,43 @@ class SierpinskiTriangle {
     }
   }
 
+  generate2dSierpinski() {
+    const gridSize = 500;
+    const vertices1 = new Float32Array([
+      gridSize,
+      0,
+      gridSize, // Bottom-left
+      -gridSize,
+      0,
+      -gridSize, // Top
+      -gridSize,
+      0,
+      gridSize, // Bottom-right
+    ]);
+
+    const vertices2 = new Float32Array([
+      -gridSize,
+      0,
+      -gridSize, // Bottom-left
+      gridSize,
+      0,
+      gridSize, // Top
+      gridSize,
+      0,
+      -gridSize, // Bottom-right
+    ]);
+
+    this.generateSierpinski(vertices1, this.settings.depth);
+    this.generateSierpinski(vertices2, this.settings.depth);
+  }
+
   /**
    * Draw vertices with the specified color.
    *
    * @param {Float32Array} vertices - The vertices to draw.
    * @param {THREE.Color} color - The color to apply to the vertices.
    */
-  drawVertices(vertices, color) {
+  drawVertices(vertices) {
     const geometry = new THREE.BufferGeometry();
     const itemSize = 3; // as a vertex has 3 values
     geometry.setAttribute(
@@ -100,7 +131,7 @@ class SierpinskiTriangle {
     // Calculate normals for the geometry
     geometry.computeVertexNormals();
 
-    const material = new THREE.MeshPhongMaterial({ color: color });
+    const material = new THREE.MeshPhongMaterial({ color: this.color });
     material.side = THREE.DoubleSide; // to see the mesh from both ways
     const mesh = new THREE.Mesh(geometry, material);
 
@@ -121,15 +152,6 @@ function midCoord(v0, v1) {
   const midz = v0[2] + 0.5 * (v1[2] - v0[2]);
 
   return [midx, midy, midz];
-}
-
-/**
- * Generate a random color.
- *
- * @returns {THREE.Color} - A random color.
- */
-function getRandomColor() {
-  return new THREE.Color(Math.random(), Math.random(), Math.random());
 }
 
 export default SierpinskiTriangle;

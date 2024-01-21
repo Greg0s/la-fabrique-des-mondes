@@ -17,9 +17,9 @@ class Wolfram {
     this.planes = [];
   }
 
-  generate(loopNb) {
+  generate(color, loopNb) {
     this.update();
-    this.draw(loopNb);
+    this.draw(color, loopNb);
   }
 
   update() {
@@ -33,21 +33,21 @@ class Wolfram {
     this.generations.push(generation);
   }
 
-  draw(loopNb = maxGen) {
+  draw(color, loopNb = maxGen) {
     for (let i = 0; i < loopNb; i++) {
-      this.drawAllGen();
+      this.drawAllGen(color);
       this.calculateNextGen();
     }
   }
 
-  drawAllGen() {
+  drawAllGen(color) {
     for (let i = 0; i <= this.currentGen; i++) {
       for (let j = 0; j < rowLength; j++) {
         if (this.generations[i][j] === 1) {
           // draw cell
           let planeGeometry = new THREE.PlaneGeometry(size, size);
           let planeMaterial = new THREE.MeshBasicMaterial({
-            color: 0xfae,
+            color: color,
             side: THREE.DoubleSide,
           });
           let plane = new THREE.Mesh(planeGeometry, planeMaterial);
