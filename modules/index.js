@@ -5,3 +5,5 @@ export { default as FitnessLandscape } from "./fitness-landscape.js";
 export { default as SierpinskiTriangle } from "./sierpinski-triangle.js";
 export { default as StrangeAttractor } from "./strange-attractors.js";
 export { Sakura as Sakura } from "./turtle.js";
+export { default as Wolfram } from "./wolfram.js";
+export { default as Ground } from "./ground.js";
