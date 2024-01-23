@@ -2,6 +2,8 @@
   "dependencies": {
     "bun": "^1.0.13",
     "dat.gui": "^0.7.9",
+    "mathjs": "^12.3.0",
+    "nearley": "^2.20.1",
     "node-sass": "^9.0.0",
     "three": "^0.156.1"
   },
