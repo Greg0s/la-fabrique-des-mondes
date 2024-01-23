@@ -174,7 +174,7 @@ function onPointerMove(event) {
 
     raycaster.setFromCamera(pointer, camera);
 
-    const intersects = raycaster.intersectObjects(allHitbox, false);
+    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? allHitbox : objects, false);
 
     if (intersects.length > 0) {
       const intersect = intersects[0];
@@ -200,7 +200,7 @@ function onPointerDown(event) {
   raycaster.setFromCamera(pointer, camera);
 
   if (mode === "edit") {
-    const intersects = raycaster.intersectObjects(allHitbox);
+    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? allHitbox : objects, false);
 
     if (event.button === 0) {
       // Left click to add
