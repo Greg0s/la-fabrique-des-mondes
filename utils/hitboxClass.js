@@ -1,13 +1,25 @@
 import * as THREE from "three";
 
+const hitboxGeometry = new THREE.BoxGeometry(1, 1, 1);
+const defaultMaterial = new THREE.MeshBasicMaterial({
+  transparent: true,
+  opacity: 0,
+});
+const debugMaterial = new THREE.MeshBasicMaterial({
+  transparent: true,
+  opacity: 0.4,
+  color: 0x00FF00
+});
+
 class Hitbox {
   constructor() {
-    const hitboxGeometry = new THREE.BoxGeometry(1, 1, 1);
-    const hitboxMaterial = new THREE.MeshBasicMaterial({
-      transparent: true,
-      opacity: 0,
-    });
-    this.mesh = new THREE.Mesh(hitboxGeometry, hitboxMaterial);
+    this.debugState = true;
+    this.mesh = new THREE.Mesh(hitboxGeometry, (this.debugState) ? debugMaterial : defaultMaterial);
+  }
+
+  toggleDebug() {
+    this.debugState = !this.debugState;
+    this.mesh.material = (this.debugState) ? debugMaterial : defaultMaterial;
   }
 
   handler(control, hitbox, mesh) {
