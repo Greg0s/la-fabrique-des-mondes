@@ -22,6 +22,7 @@ let pointer,
 let rollOverMesh, rollOverMaterial;
 
 const objects = [];
+const allHitbox = [];
 const interactableObjects = [];
 
 /* ADDED PARAMS*/
@@ -88,6 +89,7 @@ function init() {
   scene.add(plane);
 
   objects.push(plane);
+  allHitbox.push(plane);
 
   // lights
 
@@ -172,7 +174,7 @@ function onPointerMove(event) {
 
     raycaster.setFromCamera(pointer, camera);
 
-    const intersects = raycaster.intersectObjects(objects, false);
+    const intersects = raycaster.intersectObjects(allHitbox, false);
 
     if (intersects.length > 0) {
       const intersect = intersects[0];
@@ -198,7 +200,7 @@ function onPointerDown(event) {
   raycaster.setFromCamera(pointer, camera);
 
   if (mode === "edit") {
-    const intersects = raycaster.intersectObjects(objects);
+    const intersects = raycaster.intersectObjects(allHitbox);
 
     if (event.button === 0) {
       // Left click to add
@@ -279,6 +281,9 @@ function addObject(intersect) {
 
   scene.add(object.anchor);
   interactableObjects.push(object.anchor);
+  if (object.hitbox) {
+    allHitbox.push(object.hitbox.mesh);
+  }
 }
 
 function placeObject(object, intersect, isCentered) {
