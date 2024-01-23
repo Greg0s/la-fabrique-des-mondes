@@ -99,6 +99,7 @@ class Sponge {
     // Create hitbox & link to mesh
     this.hitbox = new Hitbox();
     this.hitbox.handler(this.control, this.hitbox.mesh, mesh);
+    this.anchor.add(this.hitbox.mesh);
   }
 
   onClick() {
