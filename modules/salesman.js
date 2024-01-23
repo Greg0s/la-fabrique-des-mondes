@@ -304,7 +304,7 @@ class TSP {
 	 * @todo Currently a blocking call function
 	 * @return {Path}
 	 */
-	async generate(generations = 50) {
+	async generate(generations = 100) {
 		if (this.stopFlag) {
 			this.stopFlag = false;
 		}

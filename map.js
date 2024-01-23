@@ -431,8 +431,6 @@ function render() {
 }
 
 function animate() {
-  requestAnimationFrame(animate);
-  console.log(continuousFlag);
   if (continuousFlag || eventCounts > 0) {
     updatable.forEach(u => {
       u.update();
@@ -441,4 +439,5 @@ function animate() {
     render();
     eventCounts = 0;
   }
+  requestAnimationFrame(animate);
 }
