@@ -15,7 +15,7 @@ import {
 import { getAttractorParams } from "./utils/attractors";
 
 let camera, scene, renderer;
-let plane, planeHitboxMesh;
+let plane, planeHitbox;
 let pointer,
   raycaster = false;
 
@@ -44,6 +44,13 @@ const objects = {
       Hitbox.removeInstance(mesh);
       scene.remove(removed[0]);
     }
+  },
+
+  clearWorld(scene) {
+    this.anchors.forEach(a => scene.remove(a));
+    this.hitbox = [];
+    Hitbox.instances = [];
+    this.push({anchor: plane, hitbox: planeHitbox});
   }
 };
 
@@ -116,8 +123,7 @@ function init() {
   );
   scene.add(plane);
 
-  let planeHitbox = new Hitbox(geometry);
-  planeHitboxMesh = planeHitbox.mesh;
+  planeHitbox = new Hitbox(geometry);
   objects.push({anchor: plane, hitbox: planeHitbox});
 
   // lights
@@ -182,6 +188,10 @@ function init() {
     else e.target.innerHTML = "Disabled debug mode";
     eventCounts++;
   });
+  document.querySelector(".clear").addEventListener("click", function (e) {
+    clearWorld();
+    eventCounts++;
+  });
 
   document.querySelector(".screenshot").addEventListener("click", function () {
     saveScreenshot(renderer);
@@ -212,7 +222,7 @@ function onPointerMove(event) {
 
     raycaster.setFromCamera(pointer, camera);
 
-    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? objects.hitbox : [planeHitboxMesh], false);
+    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? objects.hitbox : [planeHitbox.mesh], false);
 
     if (intersects.length > 0) {
       const intersect = intersects[0];
@@ -229,6 +239,10 @@ function onPointerMove(event) {
   }
 }
 
+function clearWorld() {
+  objects.clearWorld(scene);
+}
+
 function onPointerDown(event) {
   pointer.set(
     (event.clientX / window.innerWidth) * 2 - 1,
@@ -238,7 +252,7 @@ function onPointerDown(event) {
   raycaster.setFromCamera(pointer, camera);
 
   if (mode === "edit") {
-    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? objects.hitbox : [planeHitboxMesh], false);
+    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? objects.hitbox : [planeHitbox.mesh], false);
 
     // Left click to add
     if (intersects.length > 0) {
@@ -259,7 +273,7 @@ function removeObject(objectToRemove) {
   // const objectToRemove = interactableObjects.pop(); // take last added object
   console.log(objectToRemove.object);
 
-  if (objectToRemove.object && objectToRemove.object !== planeHitboxMesh) {
+  if (objectToRemove.object && objectToRemove.object !== planeHitbox.mesh) {
     objects.remove(objectToRemove.object, scene);
   }
 
