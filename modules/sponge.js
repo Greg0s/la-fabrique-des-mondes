@@ -2,6 +2,13 @@ import * as THREE from "three";
 import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
 import { Hitbox } from "../utils";
 
+const COLORS = [0x00008b, 0x800080, 0xcf89f2];
+
+function pickRandomColor() {
+  let color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  return color;
+}
+
 class Sponge {
   constructor(control) {
     this.anchor = new THREE.Object3D();
@@ -92,7 +99,7 @@ class Sponge {
 
     let mesh = new THREE.Mesh(
       mergedGeometry,
-      new THREE.MeshPhongMaterial({ color: 0x404040 })
+      new THREE.MeshPhongMaterial({ color: pickRandomColor() })
     );
     this.anchor.add(mesh);
 
