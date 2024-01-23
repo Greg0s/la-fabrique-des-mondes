@@ -25,6 +25,10 @@ class Hitbox {
     Hitbox.instances.forEach(i => i.mesh.material = (Hitbox.debugState) ? debugMaterial : defaultMaterial);
   }
 
+  static removeInstance(mesh) {
+    Hitbox.instances = Hitbox.instances.filter(i => i.mesh !== mesh);
+  }
+
   handler(control, hitbox, mesh) {
     control.addEventListener("dragging-changed", (event) => {
       if (event.value) {

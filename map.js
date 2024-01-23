@@ -15,7 +15,7 @@ import {
 import { getAttractorParams } from "./utils/attractors";
 
 let camera, scene, renderer;
-let plane;
+let plane, planeHitboxMesh;
 let pointer,
   raycaster = false;
 
@@ -23,10 +23,29 @@ let rollOverMesh, rollOverMaterial;
 
 let eventCounts = 0;
 
-const objects = [];
+const objects = {
+  anchors: [],
+  hitbox: [],
 
-const allHitbox = [];
-const interactableObjects = [];
+  push(o) {
+    this.anchors.push(o.anchor);
+
+    if (o.hitbox) {
+      this.hitbox.push(o.hitbox.mesh);
+    }
+  },
+
+  remove(mesh, scene) {
+    let i = this.hitbox.findIndex(m => m === mesh);
+
+    if (i !== -1) {
+      let removed = this.anchors.splice(i, 1);
+      this.hitbox.splice(i, 1);
+      Hitbox.removeInstance(mesh);
+      scene.remove(removed[0]);
+    }
+  }
+};
 
 /* ADDED PARAMS*/
 
@@ -97,8 +116,9 @@ function init() {
   );
   scene.add(plane);
 
-  objects.push(plane);
-  allHitbox.push(plane);
+  let planeHitbox = new Hitbox(geometry);
+  planeHitboxMesh = planeHitbox.mesh;
+  objects.push({anchor: plane, hitbox: planeHitbox});
 
   // lights
 
@@ -129,7 +149,7 @@ function init() {
   orbit.dampingFactor = 0.1;
   orbit.rotateSpeed = 0.5;
   orbit.addEventListener('change', () => {
-    eventCounts ++;
+    eventCounts++;
   });
 
   // TransformControls
@@ -160,7 +180,7 @@ function init() {
     toggleDebugMode();
     if (debugMode) e.target.innerHTML = "Enabled debug mode";
     else e.target.innerHTML = "Disabled debug mode";
-    eventCounts ++;
+    eventCounts++;
   });
 
   document.querySelector(".screenshot").addEventListener("click", function () {
@@ -180,7 +200,7 @@ function onWindowResize() {
 
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  eventCounts ++;
+  eventCounts++;
 }
 
 function onPointerMove(event) {
@@ -192,7 +212,7 @@ function onPointerMove(event) {
 
     raycaster.setFromCamera(pointer, camera);
 
-    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? allHitbox : objects, false);
+    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? objects.hitbox : [planeHitboxMesh], false);
 
     if (intersects.length > 0) {
       const intersect = intersects[0];
@@ -205,7 +225,7 @@ function onPointerMove(event) {
         .addScalar(25);
     }
 
-    eventCounts ++;
+    eventCounts++;
   }
 }
 
@@ -218,28 +238,29 @@ function onPointerDown(event) {
   raycaster.setFromCamera(pointer, camera);
 
   if (mode === "edit") {
-    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? allHitbox : objects, false);
+    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? objects.hitbox : [planeHitboxMesh], false);
 
-    if (event.button === 0) {
-      // Left click to add
-      if (intersects.length > 0) {
-        const intersect = intersects[0];
+    // Left click to add
+    if (intersects.length > 0) {
+      const intersect = intersects[0];
+
+      if (event.button === 0) {
         addObject(intersect);
+      } else if (event.button === 2) {
+        removeObject(intersect);
       }
-    } else if (event.button === 2) {
-      // Right click to remove last object
-      scene.remove(interactableObjects[intersects.length - 1]);
-      removeObject(interactableObjects[intersects.length - 1]);
     }
-    eventCounts ++;
+
+    eventCounts++;
   }
 }
 
-function removeObject() {
-  const objectToRemove = interactableObjects.pop(); // take last added object
+function removeObject(objectToRemove) {
+  // const objectToRemove = interactableObjects.pop(); // take last added object
+  console.log(objectToRemove.object);
 
-  if (objectToRemove) {
-    scene.remove(objectToRemove);
+  if (objectToRemove.object && objectToRemove.object !== planeHitboxMesh) {
+    objects.remove(objectToRemove.object, scene);
   }
 
   eventCounts++;
@@ -298,10 +319,7 @@ function addObject(intersect) {
   }
 
   scene.add(object.anchor);
-  interactableObjects.push(object.anchor);
-  if (object.hitbox) {
-    allHitbox.push(object.hitbox.mesh);
-  }
+  objects.push(object);
 
   eventCounts++;
 }
