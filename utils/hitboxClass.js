@@ -7,19 +7,22 @@ const defaultMaterial = new THREE.MeshBasicMaterial({
 });
 const debugMaterial = new THREE.MeshBasicMaterial({
   transparent: true,
-  opacity: 0.4,
+  opacity: 0.2,
   color: 0x00FF00
 });
 
 class Hitbox {
-  constructor() {
-    this.debugState = true;
-    this.mesh = new THREE.Mesh(hitboxGeometry, (this.debugState) ? debugMaterial : defaultMaterial);
+  static debugState = true;
+  static instances = [];
+
+  constructor(geometry = undefined) {
+    this.mesh = new THREE.Mesh((geometry) ? geometry : hitboxGeometry, (Hitbox.debugState) ? debugMaterial : defaultMaterial);
+    Hitbox.instances.push(this);
   }
 
-  toggleDebug() {
-    this.debugState = !this.debugState;
-    this.mesh.material = (this.debugState) ? debugMaterial : defaultMaterial;
+  static toggleDebug() {
+    Hitbox.debugState = !Hitbox.debugState;
+    Hitbox.instances.forEach(i => i.mesh.material = (Hitbox.debugState) ? debugMaterial : defaultMaterial);
   }
 
   handler(control, hitbox, mesh) {
@@ -31,7 +34,7 @@ class Hitbox {
       }
     });
   }
-}
+};
 
 // const hitboxHandler = (control, hitbox, mesh) => {
 //   control.addEventListener("dragging-changed", (event) => {

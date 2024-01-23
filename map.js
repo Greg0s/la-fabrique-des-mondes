@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
-import { saveScreenshot } from "/utils";
+import { saveScreenshot, Hitbox } from "/utils";
 
 // MODULES
 import {
@@ -22,12 +22,14 @@ let pointer,
 let rollOverMesh, rollOverMaterial;
 
 const objects = [];
+
 const allHitbox = [];
 const interactableObjects = [];
 
 /* ADDED PARAMS*/
 
 let mode = "edit";
+let debugMode = true;
 
 let selectedObject = "attractor";
 let selectedAttractor = "lorenz";
@@ -42,6 +44,11 @@ render();
 function toggleMode() {
   mode = mode === "edit" ? "view" : "edit";
   mode == "edit" ? scene.add(rollOverMesh) : scene.remove(rollOverMesh);
+}
+
+function toggleDebugMode() {
+  debugMode = !debugMode;
+  Hitbox.toggleDebug();
 }
 
 function init() {
@@ -143,6 +150,11 @@ function init() {
     toggleMode();
     if (mode == "view") e.target.innerHTML = "View mode";
     else if (mode == "edit") e.target.innerHTML = "Edit mode";
+  });
+  document.querySelector(".debugMode").addEventListener("click", function (e) {
+    toggleDebugMode();
+    if (debugMode) e.target.innerHTML = "Enabled debug mode";
+    else e.target.innerHTML = "Disabled debug mode";
   });
 
   document.querySelector(".screenshot").addEventListener("click", function () {
