@@ -21,6 +21,8 @@ let pointer,
 
 let rollOverMesh, rollOverMaterial;
 
+let eventCounts = 0;
+
 const objects = [];
 
 const allHitbox = [];
@@ -126,6 +128,9 @@ function init() {
   orbit.enableDamping = true;
   orbit.dampingFactor = 0.1;
   orbit.rotateSpeed = 0.5;
+  orbit.addEventListener('change', () => {
+    eventCounts ++;
+  });
 
   // TransformControls
 
@@ -155,6 +160,7 @@ function init() {
     toggleDebugMode();
     if (debugMode) e.target.innerHTML = "Enabled debug mode";
     else e.target.innerHTML = "Disabled debug mode";
+    eventCounts ++;
   });
 
   document.querySelector(".screenshot").addEventListener("click", function () {
@@ -174,7 +180,7 @@ function onWindowResize() {
 
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  render();
+  eventCounts ++;
 }
 
 function onPointerMove(event) {
@@ -197,9 +203,9 @@ function onPointerMove(event) {
         .floor()
         .multiplyScalar(50)
         .addScalar(25);
-
-      render();
     }
+
+    eventCounts ++;
   }
 }
 
@@ -219,15 +225,13 @@ function onPointerDown(event) {
       if (intersects.length > 0) {
         const intersect = intersects[0];
         addObject(intersect);
-        render();
       }
     } else if (event.button === 2) {
       // Right click to remove last object
       scene.remove(interactableObjects[intersects.length - 1]);
       removeObject(interactableObjects[intersects.length - 1]);
-
-      render();
     }
+    eventCounts ++;
   }
 }
 
@@ -237,6 +241,8 @@ function removeObject() {
   if (objectToRemove) {
     scene.remove(objectToRemove);
   }
+
+  eventCounts++;
 }
 
 function addObject(intersect) {
@@ -296,6 +302,8 @@ function addObject(intersect) {
   if (object.hitbox) {
     allHitbox.push(object.hitbox.mesh);
   }
+
+  eventCounts++;
 }
 
 function placeObject(object, intersect, isCentered) {
@@ -336,5 +344,8 @@ function render() {
 
 function animate() {
   requestAnimationFrame(animate);
-  render();
+  if (eventCounts > 0) {
+    render();
+    eventCounts = 0;
+  }
 }
