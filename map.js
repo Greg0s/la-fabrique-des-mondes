@@ -124,6 +124,7 @@ const loader = new THREE.TextureLoader();
       texture.mapping = THREE.EquirectangularReflectionMapping;
       texture.colorSpace = THREE.SRGBColorSpace;
       scene.background = texture;
+      eventCounts++;
     });
 
     
@@ -364,6 +365,17 @@ function addObject(intersect) {
       object.anchor.position.y = Math.random() * 400 + 500;
       scaleFactor = scaleFactor / 3;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      continuousFlag = true;
+      break;
+
+    case "boids":
+      object = new BoidEnvironment(boidMesh, control);
+      object.create();
+      object.anchor.position.y = Math.random() * 400 + 500;
+      scaleFactor /= 3;
+      object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      continuousFlag = true;
+      updatable.push(object);
       break;
   }
 
@@ -411,7 +423,12 @@ function render() {
 
 function animate() {
   requestAnimationFrame(animate);
-  if (eventCounts > 0) {
+  console.log(continuousFlag);
+  if (continuousFlag || eventCounts > 0) {
+    updatable.forEach(u => {
+      u.update();
+      u.render();
+    });
     render();
     eventCounts = 0;
   }
