@@ -90,8 +90,43 @@ function init() {
   camera.lookAt(0, 0, 0);
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf0f0f0);
+  // scene.background = new THREE.Color(0xf0f0f0);
 
+  //Fond image
+
+// scene.background = new THREE.CubeTextureLoader()
+// 	.setPath( './img/' )
+// 	.load( [
+// 				'cm.png',
+// 				'cm.png',
+//         'ch.png',
+// 				'cb.png',
+// 				'cm.png',
+// 				'cm.png'
+				
+//         // 'px.jpg',
+// 				// 'nx.jpg',
+// 				// 'py.jpg',
+// 				// 'ny.jpg',
+// 				// 'pz.jpg',
+// 				// 'nz.jpg'
+// 			], function(){
+//         console.log("image loaded");
+//        } );  
+//}
+
+
+
+const loader = new THREE.TextureLoader();
+  const texture = loader.load(
+    './img/nocturne.jpg',
+    () => {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+      texture.colorSpace = THREE.SRGBColorSpace;
+      scene.background = texture;
+    });
+
+    
   // roll-over helpers
 
   const rollOverGeo = new THREE.BoxGeometry(50, 50, 50);

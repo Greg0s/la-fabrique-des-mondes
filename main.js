@@ -33,7 +33,10 @@ ui.createBar(items, body);
 
 // Scene creation
 var scene = new THREE.Scene();
-scene.background = new THREE.Color(0xE6E6FA);
+// scene.background = new THREE.Color(0xE6E6FA);
+// scene.background = new THREE.Color(0xFF69B4); // Couleur rose
+
+
 
 var camera = new THREE.PerspectiveCamera(
   75,
