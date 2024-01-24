@@ -5,6 +5,9 @@ class UI {
 
     this.headerBar=document.createElement("div");
     this.headerBar.className="header";
+
+    this.secondBar=document.createElement("div");
+    this.secondBar.className="secondBar";
   }
 
   createBar(items, body) {
@@ -24,10 +27,10 @@ class UI {
     const myTitle = document.createElement("h1");
     myTitle.innerHTML="My Generative World";
     this.headerBar.appendChild(myTitle);
+    this.secondBar.appendChild(newItem);
     body.appendChild(this.headerBar);
   }
 }
-
 
 
 export default UI;

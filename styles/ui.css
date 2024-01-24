@@ -5,7 +5,8 @@
   --color-dark-blue: darkblue;
   --color-purple: purple;
   --color-pink: #cf89f2;
-  --color-temp-bg: #e6e6fa;
+  --color-bright-purple : #660FE3;
+  --color-temp-bg: #fefaef;
   --color-white: #ffffff;
 }
 
@@ -16,13 +17,16 @@ body {
 
 .bottomBar {
   display: flex;
-  gap: 2rem;
-  background-color: var(--color-pink);
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  /* gap: 2rem; */
+  background-color: var(--color-bright-purple);
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 2.5rem;
+  height: 4rem;
   margin: auto;
   padding: 1rem;
 }
@@ -35,23 +39,29 @@ body {
 .bottomBar button {
   background-color: var(--color-dark-blue);
   color: var(--color-temp-bg);
-  padding: 0.5rem 1rem;
-  border-radius: 1rem;
+  padding: 1rem 2rem;
+  border-radius: 1.5rem;
   cursor: pointer;
   transition: 0.3s ease;
   border: none;
+  font-size: 1.5rem;
 }
+
 .bottomBar button:hover {
-  opacity: 0.8;
+  /* opacity: 0.8; */
+  background-color: var(--color-pink);
+  transform: scale(1.1);
+
+
 }
 
 .header {
-  background-color: var(--color-pink);
+  background-color: var(--color-bright-purple);
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 2.5rem;
+  height: 4rem;
   margin: auto;
   padding: 1rem;
   display: flex;
@@ -61,4 +71,8 @@ body {
   color: var(--color-white);
   font-family: "Vina Sans", sans-serif;
   font-size: 2rem;
+}
+
+.secondBar{
+  background-color: red;
 }
