@@ -10,18 +10,21 @@
     <div class="ui">
       <div class="header">
         <h1>Generative world</h1>
-        <button class="screenshot">Screenshot</button>
-        <button class="selectMode">Edit mode</button>
-        <button class="debugMode">Enabled debug mode</button>
-        <button class="clear">Clear</button>
+        <div class="head-button">
+          <button class="selectMode">Edit mode</button>
+          <button class="debugMode">Enabled debug mode</button>
+          <button class="screenshot">Screenshot</button>
+          <button class="clear">Clear</button>
+        </div>
       </div>
       <ul class="bottomBar">
         <li>
-          <button class="selectObject" value="sponge">Sponge</button>
+          <button class="selectObject" value="sponge">Sponge  <span class="aspect">🧽 L'architecte s'est laissé guider par la fascinante géométrie de la Menger Sponge pour concevoir ces magnifiques immeubles, transformant ainsi une source d'inspiration infinie en une réalité architecturale extraordinaire.</span></button>
         </li>
         <li>
           <button class="selectObject" value="attractor">
-            Attracteur de
+            Attractor of
+            <span class="aspect">🌌 Les attracteurs étranges ont donné naissance à de magnifiques galaxies dans nos ciels étoilés, où les lois de la physique se mêlent à l'art pour créer des constellations mystérieuses et captivantes !</span>
             <select class="selectAttractor">
               <option value="lorenz" selected>Lorenz</option>
               <option value="rossler">Rossler</option>
@@ -36,6 +39,7 @@
         <li>
           <button class="selectObject" value="fitness-landscape">
             Fitness landscape
+            <span class="aspect">🏔️ Nos ingénieurs paysagistes ont conçu une 'Fitness Map' innovante qui a transformé nos paysages en de superbes reliefs, créant ainsi des sommets majestueux pour les amateurs d'aventure.</span>
           </button>
         </li>
         <li>

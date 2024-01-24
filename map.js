@@ -200,13 +200,25 @@ const loader = new THREE.TextureLoader();
 
   document.querySelector(".selectMode").addEventListener("click", function (e) {
     toggleMode();
-    if (mode == "view") e.target.innerHTML = "View mode";
-    else if (mode == "edit") e.target.innerHTML = "Edit mode";
+    if (mode == "view") {
+      e.target.innerHTML = "View mode";
+      e.target.style.backgroundColor = "#ebc373";
+    }
+    else if (mode == "edit") {
+      e.target.innerHTML = "Edit mode";
+      e.target.style.backgroundColor = "#cf89f2";
+    }
   });
   document.querySelector(".debugMode").addEventListener("click", function (e) {
     toggleDebugMode();
-    if (debugMode) e.target.innerHTML = "Enabled debug mode";
-    else e.target.innerHTML = "Disabled debug mode";
+    if (debugMode){
+      e.target.innerHTML = "Enabled debug mode";
+      e.target.style.backgroundColor = "#cf89f2";
+    }
+    else {
+      e.target.innerHTML = "Disabled debug mode";
+      e.target.style.backgroundColor = "#ebc373";
+    }
     eventCounts++;
   });
   document.querySelector(".clear").addEventListener("click", function (e) {
@@ -218,9 +230,7 @@ const loader = new THREE.TextureLoader();
   document.querySelector(".screenshot").addEventListener("click", function () {
     saveScreenshot(renderer);
   });
-
-  //
-
+  
   window.addEventListener("resize", onWindowResize);
 
   animate();
