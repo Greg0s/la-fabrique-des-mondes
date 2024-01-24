@@ -14,22 +14,38 @@ class Ground {
 
   buildGround() {
     this.addGrid();
-    this.addSoil();
+    this.addSoils();
     this.addWolframGrass();
     this.addSierpinskiGrass();
   }
 
-  addSoil() {
-    const planeGeometry = new THREE.PlaneGeometry(1000, 1000);
-    const planeMaterial = new THREE.MeshPhongMaterial({
-      color: soilColor,
+  addSoils() {
+    const soilThickness = 40;
+
+    this.addSoil(soilThickness, soilColor, -0.5 - soilThickness / 2);
+    // sub soil
+    this.addSoil(soilThickness * 2.5, grassColor2, -0.5 - soilThickness * 2.25);
+    // subsub soil
+    this.addSoil(soilThickness * 3.5, grassColor1, -0.5 - soilThickness * 5.25);
+  }
+
+  addSoil(thickness, color, posY) {
+    const soilWidth = 1000;
+    const soilHeight = 1000;
+
+    const soilGeometry = new THREE.BoxGeometry(
+      soilWidth,
+      thickness,
+      soilHeight
+    );
+    const soilMaterial = new THREE.MeshPhongMaterial({
+      color: color,
       opacity: 1,
       side: THREE.DoubleSide,
     });
 
-    const soil = new THREE.Mesh(planeGeometry, planeMaterial);
-    soil.rotation.x = -Math.PI / 2; // align
-    soil.position.y = -0.5; // just under the ground
+    const soil = new THREE.Mesh(soilGeometry, soilMaterial);
+    soil.position.y = posY;
     this.anchor.add(soil);
   }
 
