@@ -18,6 +18,10 @@ body {
   font-family: 'Poppins', sans-serif; 
 }
 
+h1{
+  font-size: 1em;
+}
+
 .bottomBar {
   display: flex;
   flex-direction: row;
@@ -70,9 +74,9 @@ body {
   height:auto;
   width:20em;
   font-size: 0.9em;
-  position: fixed;
-  bottom:4em;
-  left: -4.5em;
+  position:absolute;
+  bottom:25em;
+  left: -2em;
   padding:0.5em;
   border-radius: 1.5em;
   display: none;
