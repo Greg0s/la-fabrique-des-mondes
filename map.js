@@ -13,6 +13,7 @@ import {
   Ground,
 } from "/modules";
 import { getAttractorParams } from "./utils/attractors";
+import BoidEnvironment from "./modules/boids";
 
 let camera, scene, renderer;
 let plane, planeHitbox;
@@ -20,6 +21,7 @@ let pointer,
   raycaster = false;
 
 let rollOverMesh, rollOverMaterial;
+let updatable = [];
 
 let eventCounts = 0;
 
@@ -42,6 +44,7 @@ const objects = {
       let removed = this.anchors.splice(i, 1);
       this.hitbox.splice(i, 1);
       Hitbox.removeInstance(mesh);
+      updatable = updatable.filter(a => a.anchor !== removed[0]);
       scene.remove(removed[0]);
     }
   },
@@ -50,7 +53,7 @@ const objects = {
     this.anchors.forEach(a => scene.remove(a));
     this.hitbox = [];
     Hitbox.instances = [];
-    this.push({anchor: plane, hitbox: planeHitbox});
+    this.push({ anchor: plane, hitbox: planeHitbox });
   }
 };
 
@@ -63,6 +66,13 @@ let selectedObject = "attractor";
 let selectedAttractor = "lorenz";
 
 let control;
+
+let continuousFlag = false;
+
+/* CONST */
+const boidMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshPhongMaterial({color: 0xFFFFFF, transparent: true, opacity: 0.2}));
+boidMesh.add(new THREE.Mesh(new THREE.SphereGeometry(0.6, 5, 5), new THREE.MeshPhongMaterial({color: 0xAAFF00, transparent: true, opacity: 0.3})));
+boidMesh.add(new THREE.PointLight(0xFFFF99, 100, 3));
 
 /* END ADDED PARAMS*/
 
@@ -124,6 +134,7 @@ const loader = new THREE.TextureLoader();
       texture.mapping = THREE.EquirectangularReflectionMapping;
       texture.colorSpace = THREE.SRGBColorSpace;
       scene.background = texture;
+      eventCounts++;
     });
 
     
@@ -144,8 +155,6 @@ const loader = new THREE.TextureLoader();
   ground.buildGround();
   scene.add(ground.anchor);
 
-  //
-
   raycaster = new THREE.Raycaster();
   pointer = new THREE.Vector2();
 
@@ -159,7 +168,7 @@ const loader = new THREE.TextureLoader();
   scene.add(plane);
 
   planeHitbox = new Hitbox(geometry);
-  objects.push({anchor: plane, hitbox: planeHitbox});
+  objects.push({ anchor: plane, hitbox: planeHitbox });
 
   // lights
 
@@ -225,6 +234,7 @@ const loader = new THREE.TextureLoader();
   });
   document.querySelector(".clear").addEventListener("click", function (e) {
     clearWorld();
+    continuousFlag = false;
     eventCounts++;
   });
 
@@ -364,6 +374,17 @@ function addObject(intersect) {
       object.anchor.position.y = Math.random() * 400 + 500;
       scaleFactor = scaleFactor / 3;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      continuousFlag = true;
+      break;
+
+    case "boids":
+      object = new BoidEnvironment(boidMesh, control);
+      object.create();
+      object.anchor.position.y = Math.random() * 400 + 500;
+      scaleFactor /= 3;
+      object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
+      continuousFlag = true;
+      updatable.push(object);
       break;
   }
 
@@ -410,9 +431,13 @@ function render() {
 }
 
 function animate() {
-  requestAnimationFrame(animate);
-  if (eventCounts > 0) {
+  if (continuousFlag || eventCounts > 0) {
+    updatable.forEach(u => {
+      u.update();
+      u.render();
+    });
     render();
     eventCounts = 0;
   }
+  requestAnimationFrame(animate);
 }

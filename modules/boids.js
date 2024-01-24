@@ -1,22 +1,25 @@
 import * as THREE from "three";
-import { tools } from "/utils";
+import { TransformControls } from "three/addons/controls/TransformControls.js";
+import { tools, Hitbox } from "/utils";
 
 const settings = {
-  BOID_COUNT: 20,
-  WORLD_SCALE: 5,
+  BOID_COUNT: 9,
+  WORLD_SCALE: 20,
 
   VISUAL_RANGE: 0.5,
-  SEPARATION_MIN_DISTANCE: 0.3,
+  SEPARATION_MIN_DISTANCE: 0.5,
 
   SPEED_LIMIT: 0.1,
 
   COHESION_FACTOR: 0.2,
-  SEPARATION_FACTOR: 0.5,
+  SEPARATION_FACTOR: 0.9,
   ALIGNMENT_FACTOR: 0.2,
 
   WALL_MARGIN: 0.05,
   WALL_TURN_FACTOR: 0.1,
 };
+
+// var lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
 
 const behaviors = {
   /**
@@ -128,6 +131,8 @@ class Boid {
     /** @type {THREE.Mesh} */
     this.mesh = mesh.clone();
 
+    // this.line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), lineMaterial);
+// this.mesh.add(this.line);
     this.behaviors = [
       behaviors.stayInBounds,
       behaviors.alignment,
@@ -135,6 +140,8 @@ class Boid {
       behaviors.separation,
       behaviors.speedLimiter,
     ];
+
+   
   }
 
   /**
@@ -156,24 +163,31 @@ class Boid {
   }
 
   render() {
-    let mx = new THREE.Matrix4().lookAt(
-      this.position,
-      this.movement,
-      new THREE.Vector3(0, 0, 1)
-    );
-    let qt = new THREE.Quaternion().setFromRotationMatrix(mx);
+    // let mx = new THREE.Matrix4().lookAt(
+    //   this.movement
+    // );
+    // let qt = new THREE.Quaternion().setFromRotationMatrix(mx);
 
-    this.mesh.quaternion.copy(qt);
+    // this.mesh.quaternion.copy(qt);
+    this.mesh.lookAt(this.movement);
+    this.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
 
     this.mesh.position.copy(this.position);
+
+   // this.line.geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), this.movement.clone().normalize().multiplyScalar(10)]);
+
+    // Position the line at the boid's position
+    // line.position.copy(this.position);
+    
   }
 }
 
 class BoidEnvironment {
   /**
    * @param {THREE.Mesh} mesh a mesh copied to each boid created
+   * @param {THREE.TransformControls} control
    */
-  constructor(mesh) {
+  constructor(mesh, control) {
     /** @type {Boid[]} */
     this.boids = [];
 
@@ -182,6 +196,14 @@ class BoidEnvironment {
 
     /** @type {THREE.Mesh} */
     this.mesh = mesh;
+
+    /** @type {THREE.TransformControls} */
+    this.control = control;
+
+    /** @type {Hitbox} */
+    this.hitbox = new Hitbox();
+    this.hitbox.handler(this.control, this.hitbox.mesh, this.anchor);
+    this.anchor.add(this.hitbox.mesh);
   }
 
   create() {
