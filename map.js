@@ -104,32 +104,9 @@ function init() {
 
   //Fond image
 
-// scene.background = new THREE.CubeTextureLoader()
-// 	.setPath( './img/' )
-// 	.load( [
-// 				'cm.png',
-// 				'cm.png',
-//         'ch.png',
-// 				'cb.png',
-// 				'cm.png',
-// 				'cm.png'
-				
-//         // 'px.jpg',
-// 				// 'nx.jpg',
-// 				// 'py.jpg',
-// 				// 'ny.jpg',
-// 				// 'pz.jpg',
-// 				// 'nz.jpg'
-// 			], function(){
-//         console.log("image loaded");
-//        } );  
-//}
-
-
-
 const loader = new THREE.TextureLoader();
   const texture = loader.load(
-    './img/nocturne.jpg',
+    './img/fond.png',
     () => {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       texture.colorSpace = THREE.SRGBColorSpace;
