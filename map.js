@@ -22,6 +22,7 @@ let pointer,
 
 let rollOverMesh, rollOverMaterial;
 let updatable = [];
+let ground;
 
 let eventCounts = 0;
 
@@ -38,23 +39,23 @@ const objects = {
   },
 
   remove(mesh, scene) {
-    let i = this.hitbox.findIndex(m => m === mesh);
+    let i = this.hitbox.findIndex((m) => m === mesh);
 
     if (i !== -1) {
       let removed = this.anchors.splice(i, 1);
       this.hitbox.splice(i, 1);
       Hitbox.removeInstance(mesh);
-      updatable = updatable.filter(a => a.anchor !== removed[0]);
+      updatable = updatable.filter((a) => a.anchor !== removed[0]);
       scene.remove(removed[0]);
     }
   },
 
   clearWorld(scene) {
-    this.anchors.forEach(a => scene.remove(a));
+    this.anchors.forEach((a) => scene.remove(a));
     this.hitbox = [];
     Hitbox.instances = [];
     this.push({ anchor: plane, hitbox: planeHitbox });
-  }
+  },
 };
 
 /* ADDED PARAMS*/
@@ -70,9 +71,25 @@ let control;
 let continuousFlag = false;
 
 /* CONST */
-const boidMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshPhongMaterial({color: 0xFFFFFF, transparent: true, opacity: 0.2}));
-boidMesh.add(new THREE.Mesh(new THREE.SphereGeometry(0.6, 5, 5), new THREE.MeshPhongMaterial({color: 0xAAFF00, transparent: true, opacity: 0.3})));
-boidMesh.add(new THREE.PointLight(0xFFFF99, 100, 3));
+const boidMesh = new THREE.Mesh(
+  new THREE.SphereGeometry(1, 8, 8),
+  new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.2,
+  })
+);
+boidMesh.add(
+  new THREE.Mesh(
+    new THREE.SphereGeometry(0.6, 5, 5),
+    new THREE.MeshPhongMaterial({
+      color: 0xaaff00,
+      transparent: true,
+      opacity: 0.3,
+    })
+  )
+);
+boidMesh.add(new THREE.PointLight(0xffff99, 100, 3));
 
 /* END ADDED PARAMS*/
 
@@ -81,7 +98,18 @@ render();
 
 function toggleMode() {
   mode = mode === "edit" ? "view" : "edit";
-  mode == "edit" ? scene.add(rollOverMesh) : scene.remove(rollOverMesh);
+  mode == "edit" ? editMode() : viewMode();
+}
+
+function editMode() {
+  scene.add(rollOverMesh);
+  scene.add(ground.gridHelper);
+}
+
+function viewMode() {
+  scene.remove(rollOverMesh);
+  scene.remove(ground.gridHelper);
+  render();
 }
 
 function toggleDebugMode() {
@@ -104,17 +132,14 @@ function init() {
 
   //Fond image
 
-const loader = new THREE.TextureLoader();
-  const texture = loader.load(
-    './img/fond.png',
-    () => {
-      texture.mapping = THREE.EquirectangularReflectionMapping;
-      texture.colorSpace = THREE.SRGBColorSpace;
-      scene.background = texture;
-      eventCounts++;
-    });
+  const loader = new THREE.TextureLoader();
+  const texture = loader.load("./img/fond.png", () => {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    scene.background = texture;
+    eventCounts++;
+  });
 
-    
   // roll-over helpers
 
   const rollOverGeo = new THREE.BoxGeometry(50, 50, 50);
@@ -128,9 +153,10 @@ const loader = new THREE.TextureLoader();
 
   // ground
 
-  const ground = new Ground();
+  ground = new Ground();
   ground.buildGround();
   scene.add(ground.anchor);
+  scene.add(ground.gridHelper);
 
   raycaster = new THREE.Raycaster();
   pointer = new THREE.Vector2();
@@ -175,7 +201,7 @@ const loader = new THREE.TextureLoader();
   orbit.enableDamping = true;
   orbit.dampingFactor = 0.1;
   orbit.rotateSpeed = 0.5;
-  orbit.addEventListener('change', () => {
+  orbit.addEventListener("change", () => {
     eventCounts++;
   });
 
@@ -203,19 +229,17 @@ const loader = new THREE.TextureLoader();
     if (mode == "view") {
       e.target.innerHTML = "View mode";
       e.target.style.backgroundColor = "#ebc373";
-    }
-    else if (mode == "edit") {
+    } else if (mode == "edit") {
       e.target.innerHTML = "Edit mode";
       e.target.style.backgroundColor = "#cf89f2";
     }
   });
   document.querySelector(".debugMode").addEventListener("click", function (e) {
     toggleDebugMode();
-    if (debugMode){
+    if (debugMode) {
       e.target.innerHTML = "Enabled debug mode";
       e.target.style.backgroundColor = "#cf89f2";
-    }
-    else {
+    } else {
       e.target.innerHTML = "Disabled debug mode";
       e.target.style.backgroundColor = "#ebc373";
     }
@@ -230,7 +254,7 @@ const loader = new THREE.TextureLoader();
   document.querySelector(".screenshot").addEventListener("click", function () {
     saveScreenshot(renderer);
   });
-  
+
   window.addEventListener("resize", onWindowResize);
 
   animate();
@@ -254,7 +278,10 @@ function onPointerMove(event) {
 
     raycaster.setFromCamera(pointer, camera);
 
-    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? objects.hitbox : [planeHitbox.mesh], false);
+    const intersects = raycaster.intersectObjects(
+      selectedObject === "sponge" ? objects.hitbox : [planeHitbox.mesh],
+      false
+    );
 
     if (intersects.length > 0) {
       const intersect = intersects[0];
@@ -284,7 +311,10 @@ function onPointerDown(event) {
   raycaster.setFromCamera(pointer, camera);
 
   if (mode === "edit") {
-    const intersects = raycaster.intersectObjects((selectedObject === 'sponge') ? objects.hitbox : [planeHitbox.mesh], false);
+    const intersects = raycaster.intersectObjects(
+      selectedObject === "sponge" ? objects.hitbox : [planeHitbox.mesh],
+      false
+    );
 
     // Left click to add
     if (intersects.length > 0) {
@@ -419,7 +449,7 @@ function render() {
 
 function animate() {
   if (continuousFlag || eventCounts > 0) {
-    updatable.forEach(u => {
+    updatable.forEach((u) => {
       u.update();
       u.render();
     });

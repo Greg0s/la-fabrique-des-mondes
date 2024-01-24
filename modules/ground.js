@@ -34,7 +34,7 @@ class Ground {
   }
 
   addGrid() {
-    const gridHelper = new THREE.GridHelper(1000, 20);
+    this.gridHelper = new THREE.GridHelper(1000, 20);
 
     const gridMaterial = new THREE.LineBasicMaterial({
       color: gridColor,
@@ -42,11 +42,9 @@ class Ground {
       transparent: true,
     });
 
-    gridHelper.material = gridMaterial;
+    this.gridHelper.material = gridMaterial;
 
-    gridHelper.position.y = 2;
-
-    this.anchor.add(gridHelper);
+    this.gridHelper.position.y = 2;
   }
 
   addSierpinskiGrass() {
