@@ -450,7 +450,8 @@ function addObject(intersect) {
       break;
 
     case "tree":
-      object = Sakura(4, control);
+      const randomColor = sakuraColors[Math.floor(Math.random() * sakuraColors.length)];
+      object = Sakura(4, control,randomColor,0x1B1002);
       scene.add(object.group);
       scaleFactor = scaleFactor / 2;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
