@@ -283,6 +283,7 @@ function createAllPreviews() {
   let object = new Sponge(control);
   object.create(2);
   object.anchor.remove(object.hitbox.mesh);
+  object.centerPointLight.intensity = 1;
   scene = createPreview('Sponge', object.anchor);
   previewScenes['sponge'] = scene;
   allPreviewScenes.push(scene);
