@@ -41,22 +41,28 @@ class Wolfram {
   }
 
   drawAllGen(color) {
+    let planeGeometry = new THREE.PlaneGeometry(size, size);
+    let planeMaterial = new THREE.MeshBasicMaterial({
+      color: color,
+      side: THREE.DoubleSide,
+    });
+    let planeCount = this.generations.flat().filter(x => x === 1).length;
+    let planes = new THREE.InstancedMesh(planeGeometry, planeMaterial, planeCount);
+    let planeId = 0;
+
     for (let i = 0; i <= this.currentGen; i++) {
       for (let j = 0; j < rowLength; j++) {
         if (this.generations[i][j] === 1) {
           // draw cell
-          let planeGeometry = new THREE.PlaneGeometry(size, size);
-          let planeMaterial = new THREE.MeshBasicMaterial({
-            color: color,
-            side: THREE.DoubleSide,
-          });
-          let plane = new THREE.Mesh(planeGeometry, planeMaterial);
-          plane.position.set(j * size, -i * size, 0);
-          this.anchor.add(plane);
-          this.planes.push(plane);
+          planes.setMatrixAt(planeId, new THREE.Matrix4().setPosition(j * size, -i * size, 0));
+          planeId++;
         }
       }
     }
+
+    this.planes.push(planes);
+
+    this.anchor.add(planes);
   }
 
   calculateNextGen() {
