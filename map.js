@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { saveScreenshot, Hitbox } from "/utils";
+import tools from '/utils/tools';
+import { createPreview } from "/utils/preview";
 
 // MODULES
 import {
@@ -15,14 +17,22 @@ import {
 import { getAttractorParams } from "./utils/attractors";
 import BoidEnvironment from "./modules/boids";
 
-let camera, scene, renderer;
+const selectableValues = ['tree', 'sponge', 'attractor', 'fitness-landscape', 'tsp', 'boids'];
+const selectableAttractors = ['lorenz', 'rossler', 'aizawa', 'arneodo', 'sprottB', 'sprottLinzF', 'halvorsen'];
+
+let camera, mainScene, renderer;
+let previewRenderer;
+let canvas = document.getElementById('c');
 let plane, planeHitbox;
 let pointer,
   raycaster = false;
+let previewScenes = {};
+let allPreviewScenes = []; // cache
 
 let rollOverMesh, rollOverMaterial;
 let updatable = [];
 let ground;
+let previewBoids;
 
 let eventCounts = 0;
 
@@ -102,14 +112,14 @@ function toggleMode() {
 }
 
 function editMode() {
-  scene.add(rollOverMesh);
-  scene.add(ground.gridHelper);
+  mainScene.add(rollOverMesh);
+  mainScene.add(ground.gridHelper);
 }
 
 function viewMode() {
-  scene.remove(rollOverMesh);
-  scene.remove(ground.gridHelper);
-  render();
+  mainScene.remove(rollOverMesh);
+  mainScene.remove(ground.gridHelper);
+  eventCounts++;
 }
 
 function toggleDebugMode() {
@@ -127,18 +137,21 @@ function init() {
   camera.position.set(0, 800, 1300);
   camera.lookAt(0, 0, 0);
 
-  scene = new THREE.Scene();
+  mainScene = new THREE.Scene();
   // scene.background = new THREE.Color(0xf0f0f0);
 
   //Fond image
 
   const loader = new THREE.TextureLoader();
-  const texture = loader.load("./img/fond.png", () => {
-    texture.mapping = THREE.EquirectangularReflectionMapping;
-    texture.colorSpace = THREE.SRGBColorSpace;
-    scene.background = texture;
-    eventCounts++;
-  });
+  const texture = loader.load(
+    './img/fond.png',
+    () => {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+      texture.colorSpace = THREE.SRGBColorSpace;
+      mainScene.background = texture;
+      eventCounts++;
+    });
+
 
   // roll-over helpers
 
@@ -149,14 +162,14 @@ function init() {
     transparent: true,
   });
   rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial);
-  scene.add(rollOverMesh);
+  mainScene.add(rollOverMesh);
 
   // ground
 
   ground = new Ground();
   ground.buildGround();
-  scene.add(ground.anchor);
-  scene.add(ground.gridHelper);
+  mainScene.add(ground.anchor);
+  mainScene.add(ground.gridHelper);
 
   raycaster = new THREE.Raycaster();
   pointer = new THREE.Vector2();
@@ -168,7 +181,7 @@ function init() {
     geometry,
     new THREE.MeshBasicMaterial({ visible: false })
   );
-  scene.add(plane);
+  mainScene.add(plane);
 
   planeHitbox = new Hitbox(geometry);
   objects.push({ anchor: plane, hitbox: planeHitbox });
@@ -176,11 +189,11 @@ function init() {
   // lights
 
   const ambientLight = new THREE.AmbientLight(0x606060, 3);
-  scene.add(ambientLight);
+  mainScene.add(ambientLight);
 
   const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
   directionalLight.position.set(1, 0.75, 0.5).normalize();
-  scene.add(directionalLight);
+  mainScene.add(directionalLight);
 
   renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -208,7 +221,7 @@ function init() {
   // TransformControls
 
   control = new TransformControls(camera, renderer.domElement);
-  scene.add(control);
+  mainScene.add(control);
 
   // UI listeners
 
@@ -257,7 +270,74 @@ function init() {
 
   window.addEventListener("resize", onWindowResize);
 
+  if (document.getElementById('content')) {
+    createAllPreviews();
+  }
+
   animate();
+}
+
+function createAllPreviews() {
+  let scene;
+  // Sponge
+  let object = new Sponge(control);
+  object.create(2);
+  object.anchor.remove(object.hitbox.mesh);
+  scene = createPreview('Sponge', object.anchor);
+  previewScenes['sponge'] = scene;
+  allPreviewScenes.push(scene);
+
+  // Attractors
+  previewScenes['attractor'] = {};
+  selectableAttractors.forEach(a => {
+    object = new StrangeAttractor(control);
+    const { loopNb, scale } = getAttractorParams(a);
+    object.instantDraw(selectedAttractor, loopNb);
+    object.anchor.scale.set(scale, scale, scale);
+    scene = createPreview(`${tools.capitalize(a)} Attractor`, object.anchor);
+    previewScenes['attractor'][a] = scene;
+    allPreviewScenes.push(scene);
+  });
+
+  // Fitness Landscape
+  object = new FitnessLandscape(control);
+  object.geneticAlgorithmWithAdaptiveLandscape(400, 200, 0.1);
+  object.anchor.scale.set(1 / 8.5, 1 / 8.5, 1 / 8.5);
+  object.anchor.position.set(0, -0.5, 0);
+  scene = createPreview('Fitness Landscape', object.anchor);
+  previewScenes['fitness-landscape'] = scene;
+  allPreviewScenes.push(scene);
+
+  // Trees
+  object = Sakura(4, control);
+  object.anchor.scale.set(1 / 5.5, 1 / 5.5, 1 / 5.5);
+  object.anchor.position.set(0, -0.7, 0);
+  scene = createPreview('Tree', object.anchor);
+  previewScenes['tree'] = scene;
+  allPreviewScenes.push(scene);
+
+  // TSP
+  object = new TSP();
+  object.generate();
+  object.anchor.scale.set(1 / 50, 1 / 50, 1 / 50);
+  scene = createPreview('TSP', object.anchor);
+  previewScenes['tsp'] = scene;
+  allPreviewScenes.push(scene);
+
+  // Boids
+  object = new BoidEnvironment(boidMesh, control);
+  object.create();
+  object.anchor.scale.set(1 / 20, 1 / 20, 1 / 20);
+  object.anchor.remove(object.hitbox.mesh);
+  previewBoids = object;
+  scene = createPreview('Boids', object.anchor);
+  previewScenes['boids'] = scene;
+  allPreviewScenes.push(scene);
+
+  previewRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  previewRenderer.setClearColor(0xffffff, 1);
+  previewRenderer.setPixelRatio(window.devicePixelRatio);
+  eventCounts++;
 }
 
 function onWindowResize() {
@@ -299,7 +379,7 @@ function onPointerMove(event) {
 }
 
 function clearWorld() {
-  objects.clearWorld(scene);
+  objects.clearWorld(mainScene);
 }
 
 function onPointerDown(event) {
@@ -336,7 +416,7 @@ function removeObject(objectToRemove) {
   console.log(objectToRemove.object);
 
   if (objectToRemove.object && objectToRemove.object !== planeHitbox.mesh) {
-    objects.remove(objectToRemove.object, scene);
+    objects.remove(objectToRemove.object, mainScene);
   }
 
   eventCounts++;
@@ -368,7 +448,7 @@ function addObject(intersect) {
 
     case "tree":
       object = Sakura(4, control);
-      scene.add(object.group);
+      mainScene.add(object.group);
       scaleFactor = scaleFactor / 2;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
       object = placeObject(object, intersect, false);
@@ -391,7 +471,6 @@ function addObject(intersect) {
       object.anchor.position.y = Math.random() * 400 + 500;
       scaleFactor = scaleFactor / 3;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
-      continuousFlag = true;
       break;
 
     case "boids":
@@ -405,7 +484,7 @@ function addObject(intersect) {
       break;
   }
 
-  scene.add(object.anchor);
+  mainScene.add(object.anchor);
   objects.push(object);
 
   eventCounts++;
@@ -414,15 +493,24 @@ function addObject(intersect) {
 function placeObject(object, intersect, isCentered) {
   // If operations are inverted, object can be placed anywhere, not only 1 per square
 
-  object.anchor.position.copy(intersect.point).add(intersect.face.normal);
-
+  let finalPosition = intersect.point.add(intersect.face.normal);
   if (isCentered) {
-    object.anchor.position
+    finalPosition
       .divideScalar(50)
       .floor()
       .multiplyScalar(50)
       .addScalar(25);
   }
+  object.anchor.position.add(finalPosition);
+  // object.anchor.position.copy(intersect.point).add(intersect.face.normal);
+
+  // if (isCentered) {
+  //   object.anchor.position
+  //     .divideScalar(50)
+  //     .floor()
+  //     .multiplyScalar(50)
+  //     .addScalar(25);
+  // }
 
   return object;
 }
@@ -444,7 +532,55 @@ function onDocumentKeyUp(event) {
 }
 
 function render() {
-  renderer.render(scene, camera);
+  renderer.render(mainScene, camera);
+}
+
+function updateSize() {
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+
+  if (canvas.width !== width || canvas.height !== height) {
+    previewRenderer.setSize(width, height, false);
+  }
+}
+
+function previewRender() {
+  let previewScene;
+
+  if (selectedObject === 'attractor') {
+    previewScene = previewScenes['attractor'][selectedAttractor];
+  } else {
+    previewScene = previewScenes[selectedObject];
+  }
+
+  if (selectedObject === 'boids') {
+    previewBoids.update();
+    previewBoids.render();
+  }
+  // Hide other divs
+  allPreviewScenes.filter(s => s !== previewScene).forEach(s => {
+    s.userData.root.style.display = 'none';
+  });
+  previewScene.userData.root.style.display = 'inline';
+
+  updateSize();
+  canvas.style.transform = `translateY(${window.scrollY}px)`;
+  previewRenderer.setClearColor(0xffffff);
+  previewRenderer.setScissorTest(false);
+  previewRenderer.clear();
+  previewRenderer.setClearColor(0x909090);
+  previewRenderer.setScissorTest(true);
+
+  animatePV(previewScene);
+  /*
+  for (const [key, scene] of Object.entries(previewScenes)) {
+    console.log(key, scene);
+    if (key == 'attractor') {
+      Object.values(previewScenes['attractor']).forEach(animatePV);
+    } else {
+      animatePV(scene);
+    }
+  }*/
 }
 
 function animate() {
@@ -456,6 +592,8 @@ function animate() {
     render();
     eventCounts = 0;
   }
+
+  previewRender();
   requestAnimationFrame(animate);
 }
 
@@ -491,27 +629,59 @@ document.querySelectorAll('.selectObject').forEach((button) => {
       case 'attractor':
         dynamicContentDiv.innerHTML = "<span class='aspect'>🌌 Les attracteurs étranges ont donné naissance à de magnifiques galaxies dans nos ciels étoilés, où les lois de la physique se mêlent à l'art pour créer des constellations mystérieuses et captivantes !</span>";
         break;
-        case 'fitness-landscape':
+      case 'fitness-landscape':
         dynamicContentDiv.innerHTML = "<span class='aspect'>🏔️ Nos ingénieurs paysagistes ont conçu une 'Fitness Map' innovante qui a transformé nos paysages en de superbes reliefs, créant ainsi des sommets majestueux pour les amateurs d'aventure.</span>";
         break;
-        case 'tree':
-          dynamicContentDiv.innerHTML = "<span class='aspect'>🌳🌸 Nos jardiniers ont conçut des L-Systems pour transformer vos écrans en jardins numériques où les pixels fleurissent en branches et fleurs de cerisier japonais.</span>";
-          break;
-          case 'tsp':
-          dynamicContentDiv.innerHTML = "<span class='aspect'>tsp</span>";
-          break;
-          case 'boids':
-          dynamicContentDiv.innerHTML = "<span class='aspect'>boids</span>";
-          break;
+      case 'tree':
+        dynamicContentDiv.innerHTML = "<span class='aspect'>🌳🌸 Nos jardiniers ont conçut des L-Systems pour transformer vos écrans en jardins numériques où les pixels fleurissent en branches et fleurs de cerisier japonais.</span>";
+        break;
+      case 'tsp':
+        dynamicContentDiv.innerHTML = "<span class='aspect'>tsp</span>";
+        break;
+      case 'boids':
+        dynamicContentDiv.innerHTML = "<span class='aspect'>boids</span>";
+        break;
       default:
         dynamicContentDiv.innerHTML = ''; // Effacer le contenu par défaut si aucun bouton n'est survolé
     }
     // Afficher la div si elle est cachée
     document.querySelector('.card').style.display = 'inline-block';
   });
-    // Sortie du survol des boutons selectObject
-    button.addEventListener('mouseout', function () {
-      // Cacher la div lorsque rien n'est survolé
-      document.querySelector('.card').style.display = 'none';
-    });
+  // Sortie du survol des boutons selectObject
+  button.addEventListener('mouseout', function () {
+    // Cacher la div lorsque rien n'est survolé
+    document.querySelector('.card').style.display = 'none';
+  });
 });
+
+function animatePV(scene) {
+  // so something moves
+  scene.children[0].rotation.y = Date.now() * 0.001;
+
+  // get the element that is a place holder for where we want to
+  // draw the scene
+  const element = scene.userData.element;
+
+  // get its position relative to the page's viewport
+  const rect = element.getBoundingClientRect();
+
+  // check if it's offscreen. If so skip it
+  if (rect.bottom < 0 || rect.top > previewRenderer.domElement.clientHeight ||
+    rect.right < 0 || rect.left > previewRenderer.domElement.clientWidth) {
+
+    return; // it's off screen
+  }
+
+  // set the viewport
+  const width = rect.right - rect.left;
+  const height = rect.bottom - rect.top;
+  const left = rect.left;
+  const bottom = previewRenderer.domElement.clientHeight - rect.bottom;
+
+  previewRenderer.setViewport(left, bottom, width, height);
+  previewRenderer.setScissor(left, bottom, width, height);
+
+  const previewCamera = scene.userData.camera;
+
+  previewRenderer.render(scene, previewCamera);
+}
