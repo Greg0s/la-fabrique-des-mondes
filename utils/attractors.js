@@ -1,3 +1,8 @@
+/**
+ * 
+ * @param {string} selectedAttractor : Attractor name
+ * @returns Custom parameters for attractors
+ */
 export function getAttractorParams(selectedAttractor) {
   switch (selectedAttractor) {
     case "lorenz":
