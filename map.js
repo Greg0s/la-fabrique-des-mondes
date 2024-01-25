@@ -467,6 +467,8 @@ document.querySelectorAll(".selectObject").forEach((button) => {
     // Retirer la classe "active" de tous les boutons
     document.querySelectorAll(".selectObject").forEach((btn) => {
       btn.classList.remove("active");
+      // btn.style.backgroundColor = "darkblue";
+
     });
 
     // Ajouter la classe "active" au bouton sélectionné

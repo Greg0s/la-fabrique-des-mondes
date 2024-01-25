@@ -68,24 +68,9 @@ h1{
   background-color: var(--color-orange);
 }
 
-/* .aspect{
-  background-color: var(--color-pink);
-  color: var(--color-temp-bg);
-  display: inline-block;
-  text-align: center;
-  animation: opac 0.7s;
-  position: absolute;
-  height:auto;
-  width:20em;
-  font-size: 0.9em;
-  position:absolute;
-  bottom:25em;
-  left: -2em;
-  padding:0.5em;
-  border-radius: 1.5em;
-  display: none;
+.selectObject{
+  background-color: var(--color-dark-blue);
 }
- */
 
 .header {
   background-color: var(--color-bright-purple);
