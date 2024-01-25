@@ -147,3 +147,12 @@ h1{
 .clear{
   background-color: var(--color-dark-blue);
 }
+
+.selectAttractor{
+  background-color: var(--color-dark-blue);
+  color:var(--color-temp-bg);
+  margin-left: 1em;
+  padding:0.8em;
+  border:solid 2px white;
+  border-radius: 1em;
+}
