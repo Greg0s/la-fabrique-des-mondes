@@ -271,20 +271,32 @@ class TSP {
 
 		const simpleSphere = new THREE.SphereGeometry(0.5, 8, 8);
 
+		this.cityMesh = new THREE.InstancedMesh(
+			simpleSphere,
+			new THREE.MeshBasicMaterial({ color: __SETTINGS__.pointColor, transparent: true, opacity: 0.4 }),
+			this.environment.points.length
+		);
+
+		for (let i = 0 ; i < this.environment.points.length ; i++) {
+			let pointLight = new THREE.PointLight(__SETTINGS__.lightColor, 100);
+			pointLight.position.copy(this.environment.points[i]);
+			this.cityMesh.setMatrixAt(i, new THREE.Matrix4().setPosition(this.environment.points[i]));
+			this.lights.add(pointLight);
+		}
+
+		this.lights.add(this.cityMesh);
+
 		const createCity = (position, _color = 0xffffff) => {
 			let pointLight = new THREE.PointLight(__SETTINGS__.lightColor, 100);
 			pointLight.add(
 				new THREE.Mesh(
 					simpleSphere,
-					new THREE.MeshBasicMaterial({ color: _color })
+					new THREE.MeshPhongMaterial({ color: _color, transparent: true, opacity: 0.6 })
 				));
 			pointLight.position.copy(position);
 			this.lights.add(pointLight);
 		};
 
-		for (let i = 0; i < this.environment.points.length; i++) {
-			createCity(this.environment.points[i], __SETTINGS__.pointColor);
-		}
 		createCity(this.environment.start, 0xf6c94f);
 	}
 
