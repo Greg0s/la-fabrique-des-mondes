@@ -20,10 +20,6 @@ export function createPreview(name, object3D) {
     const sceneElement = document.createElement('div');
     element.appendChild(sceneElement);
 
-    const descriptionElement = document.createElement('div');
-    descriptionElement.innerText = name;
-    element.appendChild(descriptionElement);
-
     // the element that represents the area we want to render the scene
     scene.userData.element = sceneElement;
     scene.userData.root = element;
