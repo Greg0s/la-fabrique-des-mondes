@@ -109,7 +109,7 @@ class Sponge {
     this.anchor.add(this.hitbox.mesh);
 
     // Create center light
-    const centerPointLight = new THREE.PointLight(0xffffff, 5000);
+    const centerPointLight = new THREE.PointLight(0xf7ca4e, 5000);
     this.anchor.add(centerPointLight);
   }
 }
