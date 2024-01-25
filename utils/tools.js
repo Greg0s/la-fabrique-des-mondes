@@ -11,8 +11,16 @@ function randomPoint() {
   );
 }
 
+/**
+ * @returns A copy of the string with the first letter capitalized.
+ */
+function capitalize(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 const api = {
   randomPoint,
+  capitalize
 };
 
 export default api;
