@@ -21,7 +21,7 @@ const selectableValues = ['tree', 'sponge', 'attractor', 'fitness-landscape', 't
 const selectableAttractors = ['lorenz', 'rossler', 'aizawa', 'arneodo', 'sprottB', 'sprottLinzF', 'halvorsen'];
 
 let camera, mainScene, renderer;
-let previewRenderer;
+let previewRenderer, currentPreviewScene;
 let canvas = document.getElementById('c');
 let plane, planeHitbox;
 let pointer,
@@ -336,8 +336,9 @@ function createAllPreviews() {
   allPreviewScenes.push(scene);
 
   previewRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-  previewRenderer.setClearColor(0xffffff, 1);
   previewRenderer.setPixelRatio(window.devicePixelRatio);
+  previewRenderer.setClearColor(0x6041d3, 0);
+  previewRenderer.setScissorTest(true);
   eventCounts++;
 }
 
@@ -451,7 +452,7 @@ function addObject(intersect) {
 
     case "tree":
       const randomColor = sakuraColors[Math.floor(Math.random() * sakuraColors.length)];
-      object = Sakura(4, control,randomColor,0x1B1002);
+      object = Sakura(4, control, randomColor, 0x1B1002);
       scaleFactor = scaleFactor / 2;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
       object = placeObject(object, intersect, false);
@@ -548,42 +549,20 @@ function updateSize() {
 }
 
 function previewRender() {
-  let previewScene;
-
-  if (selectedObject === 'attractor') {
-    previewScene = previewScenes['attractor'][selectedAttractor];
-  } else {
-    previewScene = previewScenes[selectedObject];
-  }
-
-  if (selectedObject === 'boids') {
+  if (currentPreviewScene.name === 'Boids') {
     previewBoids.update();
     previewBoids.render();
   }
   // Hide other divs
-  allPreviewScenes.filter(s => s !== previewScene).forEach(s => {
+  allPreviewScenes.filter(s => s !== currentPreviewScene).forEach(s => {
     s.userData.root.style.display = 'none';
   });
-  previewScene.userData.root.style.display = 'inline';
+  currentPreviewScene.userData.root.style.display = 'inline';
 
   updateSize();
   canvas.style.transform = `translateY(${window.scrollY}px)`;
-  // previewRenderer.setClearColor(0xffffff);
-  // previewRenderer.setScissorTest(false);
-  // previewRenderer.clear();
-  previewRenderer.setClearColor(0x6041d3, 0.5);
-  previewRenderer.setScissorTest(true);
 
-  animatePV(previewScene);
-  /*
-  for (const [key, scene] of Object.entries(previewScenes)) {
-    console.log(key, scene);
-    if (key == 'attractor') {
-      Object.values(previewScenes['attractor']).forEach(animatePV);
-    } else {
-      animatePV(scene);
-    }
-  }*/
+  animatePV(currentPreviewScene);
 }
 
 function animate() {
@@ -596,7 +575,10 @@ function animate() {
     eventCounts = 0;
   }
 
-  previewRender();
+  if (currentPreviewScene && currentPreviewScene.userData.element.display !== 'none') {
+    // console.log(currentPreviewScene);
+    previewRender();
+  }
   requestAnimationFrame(animate);
 }
 
@@ -620,10 +602,12 @@ document.querySelectorAll(".selectObject").forEach((button) => {
 
 //Card dynamique pour la légende
 
-const dynamicContentDiv = document.querySelector('.dynamic-content','prev');
+const dynamicContentDiv = document.querySelector('.dynamic-content', 'prev');
 document.querySelectorAll('.selectObject').forEach((button) => {
   button.addEventListener('mouseover', function () {
     const buttonValue = this.value;
+
+    console.log(`Hovering ${buttonValue}`);
     // Mettre à jour le contenu en fonction de la valeur du bouton
     switch (buttonValue) {
       case 'sponge':
@@ -647,6 +631,10 @@ document.querySelectorAll('.selectObject').forEach((button) => {
       default:
         dynamicContentDiv.innerHTML = ''; // Effacer le contenu par défaut si aucun bouton n'est survolé
     }
+
+    currentPreviewScene = (buttonValue === 'attractor') ? previewScenes[buttonValue][selectedAttractor] : previewScenes[buttonValue];
+    // console.log(currentPreviewScene);
+
     // Afficher la div si elle est cachée
     document.querySelector('.card').style.display = 'inline-block';
     document.querySelector('.prev').style.display = 'inline-block';
@@ -654,6 +642,7 @@ document.querySelectorAll('.selectObject').forEach((button) => {
   // Sortie du survol des boutons selectObject
   button.addEventListener('mouseout', function () {
     // Cacher la div lorsque rien n'est survolé
+    currentPreviewScene = undefined;
     document.querySelector('.card').style.display = 'none';
     document.querySelector('.prev').style.display = 'none';
   });

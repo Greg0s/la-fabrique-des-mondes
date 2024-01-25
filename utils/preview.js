@@ -12,6 +12,7 @@ const content = document.getElementById('content');
  */
 export function createPreview(name, object3D) {
     const scene = new THREE.Scene();
+    scene.name = name;
 
     // make a list item
     const element = document.createElement('div');
