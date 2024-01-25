@@ -1,13 +1,18 @@
 import * as THREE from "three";
 import { Hitbox } from "../utils";
 
+function getRandomColor() {
+  const colors = [0x5112b8, 0x660fe3, 0x6e34ea, 0xf6c94f];
+  return colors[Math.floor(Math.random() * 4)];
+}
+
 class FitnessLandscape {
   constructor(control) {
     this.settings = {
       colors: [],
       gridSize: 10,
       vertices: new Float32Array(20 * 20 * 3),
-      materialFacesColor: 0x84,
+      materialFacesColor: getRandomColor(),
       targetValue: 0.5,
       landscapeNb: 1,
       factor: 25,
@@ -216,6 +221,18 @@ class FitnessLandscape {
           belowNextZ
         );
 
+        const minY = 0;
+        const maxY = 50;
+        const factor = (currentY - minY) / (maxY - minY);
+
+        const interpolatedColor = interpolateColor(
+          "#660FE3",
+          "#F6C94F",
+          factor
+        );
+
+        this.settings.colors.push(interpolatedColor);
+
         this.settings.colors.push(
           currentX / 30 + 0.5,
           currentY / 30 + 0.5,
@@ -294,6 +311,28 @@ class FitnessLandscape {
     const fitnessScore = 1 / (1 + difference);
     return fitnessScore;
   }
+}
+
+function interpolateColor(color1, color2, factor) {
+  const r1 = parseInt(color1.substring(1, 3), 16);
+  const g1 = parseInt(color1.substring(3, 5), 16);
+  const b1 = parseInt(color1.substring(5, 7), 16);
+
+  const r2 = parseInt(color2.substring(1, 3), 16);
+  const g2 = parseInt(color2.substring(3, 5), 16);
+  const b2 = parseInt(color2.substring(5, 7), 16);
+
+  const r = Math.round(r1 + factor * (r2 - r1))
+    .toString(16)
+    .padStart(2, "0");
+  const g = Math.round(g1 + factor * (g2 - g1))
+    .toString(16)
+    .padStart(2, "0");
+  const b = Math.round(b1 + factor * (b2 - b1))
+    .toString(16)
+    .padStart(2, "0");
+
+  return `#${r}${g}${b}`;
 }
 
 export default FitnessLandscape;
