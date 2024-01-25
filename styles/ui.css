@@ -172,10 +172,8 @@ h1 {
 
 #content {
   position: absolute;
-  /* display: none;*/
-  top: 1em;
-  left:2em;
-  z-index: 1;
+  top: 0em;
+  /* z-index: 1; */
   /* width: 15em;
   height: 15em; */
 }
@@ -187,12 +185,6 @@ h1 {
   /*  display: none;*/
   width: 15em;
   height: 15em;
-  background: rgba(96, 65, 211, 0.5);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(6.3px);
-  -webkit-backdrop-filter: blur(6.3px);
-  border: 1px solid rgba(254, 250, 239, 0.47);
 }
 
 .list-item {

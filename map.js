@@ -568,10 +568,10 @@ function previewRender() {
 
   updateSize();
   canvas.style.transform = `translateY(${window.scrollY}px)`;
-  previewRenderer.setClearColor(0xffffff);
-  previewRenderer.setScissorTest(false);
-  previewRenderer.clear();
-  previewRenderer.setClearColor(0x909090);
+  // previewRenderer.setClearColor(0xffffff);
+  // previewRenderer.setScissorTest(false);
+  // previewRenderer.clear();
+  previewRenderer.setClearColor(0x6041d3, 0.5);
   previewRenderer.setScissorTest(true);
 
   animatePV(previewScene);
@@ -620,7 +620,7 @@ document.querySelectorAll(".selectObject").forEach((button) => {
 
 //Card dynamique pour la légende
 
-const dynamicContentDiv = document.querySelector('.dynamic-content');
+const dynamicContentDiv = document.querySelector('.dynamic-content','prev');
 document.querySelectorAll('.selectObject').forEach((button) => {
   button.addEventListener('mouseover', function () {
     const buttonValue = this.value;
@@ -649,11 +649,13 @@ document.querySelectorAll('.selectObject').forEach((button) => {
     }
     // Afficher la div si elle est cachée
     document.querySelector('.card').style.display = 'inline-block';
+    document.querySelector('.prev').style.display = 'inline-block';
   });
   // Sortie du survol des boutons selectObject
   button.addEventListener('mouseout', function () {
     // Cacher la div lorsque rien n'est survolé
     document.querySelector('.card').style.display = 'none';
+    document.querySelector('.prev').style.display = 'none';
   });
 });
 
