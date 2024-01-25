@@ -36,6 +36,8 @@ let previewBoids;
 
 let eventCounts = 0;
 
+let buttons, card, prev;
+
 const objects = {
   anchors: [],
   hitbox: [],
@@ -79,6 +81,7 @@ let selectedAttractor = "lorenz";
 let control;
 
 let continuousFlag = false;
+let continuousFrames = 0;
 
 /* CONST */
 const boidMesh = new THREE.Mesh(
@@ -166,10 +169,15 @@ function init() {
 
   // ground
 
-  ground = new Ground();
-  ground.buildGround();
-  mainScene.add(ground.anchor);
-  mainScene.add(ground.gridHelper);
+  const buildGround = async () => {
+    ground = new Ground();
+    ground.buildGround();
+    mainScene.add(ground.anchor);
+    mainScene.add(ground.gridHelper);
+    console.log("Ground successfully built.");
+  };
+
+  buildGround();
 
   raycaster = new THREE.Raycaster();
   pointer = new THREE.Vector2();
@@ -225,59 +233,80 @@ function init() {
 
   // UI listeners
 
-  document.querySelectorAll(".selectObject").forEach((item) => {
-    item.addEventListener("click", function () {
-      selectedObject = item.value;
-    });
-  });
-
-  document
-    .querySelector(".selectAttractor")
-    .addEventListener("change", function (e) {
-      selectedAttractor = e.target.value;
-    });
-
-  document.querySelector(".selectMode").addEventListener("click", function (e) {
-    toggleMode();
-    if (mode == "view") {
-      e.target.innerHTML = "View mode";
-      e.target.style.backgroundColor = "#ebc373";
-    } else if (mode == "edit") {
-      e.target.innerHTML = "Edit mode";
-      e.target.style.backgroundColor = "#cf89f2";
+  const setListeners = async () => {
+    console.log('Building UI Listeners...');
+    const getButtons = async () => {
+      buttons = document.querySelectorAll(".selectObject");
+      buttons.forEach((item) => {
+        item.addEventListener("click", function () {
+          selectedObject = item.value;
+        });
+        console.log(item);
+      });
     }
-  });
-  document.querySelector(".debugMode").addEventListener("click", function (e) {
-    toggleDebugMode();
-    if (debugMode) {
-      e.target.innerHTML = "Enabled debug mode";
-      e.target.style.backgroundColor = "#cf89f2";
-    } else {
-      e.target.innerHTML = "Disabled debug mode";
-      e.target.style.backgroundColor = "#ebc373";
-    }
-    eventCounts++;
-  });
-  document.querySelector(".clear").addEventListener("click", function (e) {
-    clearWorld();
-    continuousFlag = false;
-    eventCounts++;
-  });
+    getButtons().then("Buttons built");
 
-  document.querySelector(".screenshot").addEventListener("click", function () {
-    saveScreenshot(renderer);
-  });
+    document
+      .querySelector(".selectAttractor")
+      .addEventListener("change", function (e) {
+        selectedAttractor = e.target.value;
+      });
 
-  window.addEventListener("resize", onWindowResize);
+    const setMenuButtons = async () => {
+      document.querySelectorAll(".menuButton").forEach(b => {
+        switch (b.classList[0]) {
+          case "selectMode": b.addEventListener("click", function (e) {
+            toggleMode();
+            if (mode == "view") {
+              e.target.innerHTML = "View mode";
+              e.target.style.backgroundColor = "#ebc373";
+            } else if (mode == "edit") {
+              e.target.innerHTML = "Edit mode";
+              e.target.style.backgroundColor = "#cf89f2";
+            }
+          }); break;
+          case "debugMode": b.addEventListener("click", function (e) {
+            toggleDebugMode();
+            if (debugMode) {
+              e.target.innerHTML = "Enabled debug mode";
+              e.target.style.backgroundColor = "#cf89f2";
+            } else {
+              e.target.innerHTML = "Disabled debug mode";
+              e.target.style.backgroundColor = "#ebc373";
+            }
+            eventCounts++;
+          }); break;
+          case "clear": b.addEventListener("click", function (e) {
+            clearWorld();
+            continuousFlag = false;
+            eventCounts++;
+          }); break;
+          case "screenshot": b.addEventListener("click", function () {
+            saveScreenshot(renderer);
+          }); break;
+        }
+      });
+    };
+    setMenuButtons().then(() => console.log("Set menu buttons."));
 
-  if (document.getElementById('content')) {
-    createAllPreviews();
+    window.addEventListener("resize", onWindowResize);
+
+    const setPreview = async () => {
+      card = document.querySelector('.card');
+      prev = document.querySelector('.prev');
+    };
+    setPreview().then(() => console.log('Built preview'));
   }
+  setListeners().then(() => console.log('Built UI Listeners.'));
 
-  animate();
+  setTimeout(async () => createAllPreviews().then(() => console.log('Preview scenes loaded.')), 2000);
+
+  requestAnimationFrame(animate);
+
+  console.log("Ready!");
 }
 
-function createAllPreviews() {
+async function createAllPreviews() {
   let scene;
   // Sponge
   let object = new Sponge(control);
@@ -374,9 +403,8 @@ function onPointerMove(event) {
         .floor()
         .multiplyScalar(50)
         .addScalar(25);
+      eventCounts++;
     }
-
-    eventCounts++;
   }
 }
 
@@ -407,9 +435,8 @@ function onPointerDown(event) {
       } else if (event.button === 2) {
         removeObject(intersect);
       }
+      eventCounts++;
     }
-
-    eventCounts++;
   }
 }
 
@@ -566,29 +593,35 @@ function previewRender() {
 }
 
 function animate() {
-  if (continuousFlag || eventCounts > 0) {
+  if (eventCounts > 0 || (continuousFlag && continuousFrames > 2)) {
     updatable.forEach((u) => {
-      u.update();
+      for (let i = 0; i < continuousFrames; i++) {
+        u.update();
+      }
       u.render();
     });
     render();
     eventCounts = 0;
+    continuousFrames = 0;
+  } else if (continuousFlag) {
+    continuousFrames++;
   }
 
   if (currentPreviewScene && currentPreviewScene.userData.element.display !== 'none') {
     // console.log(currentPreviewScene);
     previewRender();
   }
+
   requestAnimationFrame(animate);
 }
 
 //Changer couleur quand bouton actif
-document.querySelectorAll(".selectObject").forEach((button) => {
+buttons.forEach((button) => {
   button.addEventListener("click", function () {
     selectedObject = this.value;
 
     // Retirer la classe "active" de tous les boutons
-    document.querySelectorAll(".selectObject").forEach((btn) => {
+    buttons.forEach((btn) => {
       btn.classList.remove("active");
       // btn.style.backgroundColor = "darkblue";
 
@@ -603,7 +636,7 @@ document.querySelectorAll(".selectObject").forEach((button) => {
 //Card dynamique pour la légende
 
 const dynamicContentDiv = document.querySelector('.dynamic-content', 'prev');
-document.querySelectorAll('.selectObject').forEach((button) => {
+buttons.forEach((button) => {
   button.addEventListener('mouseover', function () {
     const buttonValue = this.value;
 
@@ -636,15 +669,15 @@ document.querySelectorAll('.selectObject').forEach((button) => {
     // console.log(currentPreviewScene);
 
     // Afficher la div si elle est cachée
-    document.querySelector('.card').style.display = 'inline-block';
-    document.querySelector('.prev').style.display = 'inline-block';
+    card.style.display = 'inline-block';
+    prev.style.display = 'inline-block';
   });
   // Sortie du survol des boutons selectObject
   button.addEventListener('mouseout', function () {
     // Cacher la div lorsque rien n'est survolé
     currentPreviewScene = undefined;
-    document.querySelector('.card').style.display = 'none';
-    document.querySelector('.prev').style.display = 'none';
+    card.style.display = 'none';
+    prev.style.display = 'none';
   });
 });
 
