@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { saveScreenshot, Hitbox } from "/utils";
-import tools from '/utils/tools';
+import tools from "/utils/tools";
 import { createPreview } from "/utils/preview";
 
 // MODULES
@@ -17,12 +17,27 @@ import {
 import { getAttractorParams } from "./utils/attractors";
 import BoidEnvironment from "./modules/boids";
 
-const selectableValues = ['tree', 'sponge', 'attractor', 'fitness-landscape', 'tsp', 'boids'];
-const selectableAttractors = ['lorenz', 'rossler', 'aizawa', 'arneodo', 'sprottB', 'sprottLinzF', 'halvorsen'];
+const selectableValues = [
+  "tree",
+  "sponge",
+  "attractor",
+  "fitness-landscape",
+  "tsp",
+  "boids",
+];
+const selectableAttractors = [
+  "lorenz",
+  "rossler",
+  "aizawa",
+  "arneodo",
+  "sprottB",
+  "sprottLinzF",
+  "halvorsen",
+];
 
 let camera, mainScene, renderer;
 let previewRenderer, currentPreviewScene;
-let canvas = document.getElementById('c');
+let canvas = document.getElementById("c");
 let plane, planeHitbox;
 let pointer,
   raycaster = false;
@@ -146,15 +161,12 @@ function init() {
   //Fond image
 
   const loader = new THREE.TextureLoader();
-  const texture = loader.load(
-    './img/fond.png',
-    () => {
-      texture.mapping = THREE.EquirectangularReflectionMapping;
-      texture.colorSpace = THREE.SRGBColorSpace;
-      mainScene.background = texture;
-      eventCounts++;
-    });
-
+  const texture = loader.load("./img/fond.png", () => {
+    texture.mapping = THREE.EquirectangularReflectionMapping;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    mainScene.background = texture;
+    eventCounts++;
+  });
 
   // roll-over helpers
 
@@ -234,7 +246,7 @@ function init() {
   // UI listeners
 
   const setListeners = async () => {
-    console.log('Building UI Listeners...');
+    console.log("Building UI Listeners...");
     const getButtons = async () => {
       buttons = document.querySelectorAll(".selectObject");
       buttons.forEach((item) => {
@@ -243,7 +255,7 @@ function init() {
         });
         console.log(item);
       });
-    }
+    };
     getButtons().then("Buttons built");
 
     document
@@ -253,37 +265,45 @@ function init() {
       });
 
     const setMenuButtons = async () => {
-      document.querySelectorAll(".menuButton").forEach(b => {
+      document.querySelectorAll(".menuButton").forEach((b) => {
         switch (b.classList[0]) {
-          case "selectMode": b.addEventListener("click", function (e) {
-            toggleMode();
-            if (mode == "view") {
-              e.target.innerHTML = "View mode";
-              e.target.style.backgroundColor = "#ebc373";
-            } else if (mode == "edit") {
-              e.target.innerHTML = "Edit mode";
-              e.target.style.backgroundColor = "#cf89f2";
-            }
-          }); break;
-          case "debugMode": b.addEventListener("click", function (e) {
-            toggleDebugMode();
-            if (debugMode) {
-              e.target.innerHTML = "Enabled debug mode";
-              e.target.style.backgroundColor = "#cf89f2";
-            } else {
-              e.target.innerHTML = "Disabled debug mode";
-              e.target.style.backgroundColor = "#ebc373";
-            }
-            eventCounts++;
-          }); break;
-          case "clear": b.addEventListener("click", function (e) {
-            clearWorld();
-            continuousFlag = false;
-            eventCounts++;
-          }); break;
-          case "screenshot": b.addEventListener("click", function () {
-            saveScreenshot(renderer);
-          }); break;
+          case "selectMode":
+            b.addEventListener("click", function (e) {
+              toggleMode();
+              if (mode == "view") {
+                e.target.innerHTML = "View mode";
+                e.target.style.backgroundColor = "#ebc373";
+              } else if (mode == "edit") {
+                e.target.innerHTML = "Edit mode";
+                e.target.style.backgroundColor = "#cf89f2";
+              }
+            });
+            break;
+          case "debugMode":
+            b.addEventListener("click", function (e) {
+              toggleDebugMode();
+              if (debugMode) {
+                e.target.innerHTML = "Enabled debug mode";
+                e.target.style.backgroundColor = "#cf89f2";
+              } else {
+                e.target.innerHTML = "Disabled debug mode";
+                e.target.style.backgroundColor = "#ebc373";
+              }
+              eventCounts++;
+            });
+            break;
+          case "clear":
+            b.addEventListener("click", function (e) {
+              clearWorld();
+              continuousFlag = false;
+              eventCounts++;
+            });
+            break;
+          case "screenshot":
+            b.addEventListener("click", function () {
+              saveScreenshot(renderer);
+            });
+            break;
         }
       });
     };
@@ -292,14 +312,18 @@ function init() {
     window.addEventListener("resize", onWindowResize);
 
     const setPreview = async () => {
-      card = document.querySelector('.card');
-      prev = document.querySelector('.prev');
+      card = document.querySelector(".card");
+      prev = document.querySelector(".prev");
     };
-    setPreview().then(() => console.log('Built preview'));
-  }
-  setListeners().then(() => console.log('Built UI Listeners.'));
+    setPreview().then(() => console.log("Built preview"));
+  };
+  setListeners().then(() => console.log("Built UI Listeners."));
 
-  setTimeout(async () => createAllPreviews().then(() => console.log('Preview scenes loaded.')), 2000);
+  setTimeout(
+    async () =>
+      createAllPreviews().then(() => console.log("Preview scenes loaded.")),
+    2000
+  );
 
   requestAnimationFrame(animate);
 
@@ -313,19 +337,20 @@ async function createAllPreviews() {
   object.create(2);
   object.anchor.remove(object.hitbox.mesh);
   object.centerPointLight.intensity = 1;
-  scene = createPreview('Sponge', object.anchor);
-  previewScenes['sponge'] = scene;
+  scene = createPreview("Sponge", object.anchor);
+  previewScenes["sponge"] = scene;
   allPreviewScenes.push(scene);
 
   // Attractors
-  previewScenes['attractor'] = {};
-  selectableAttractors.forEach(a => {
+  previewScenes["attractor"] = {};
+  selectableAttractors.forEach((a) => {
     object = new StrangeAttractor(control);
-    const { loopNb, scale } = getAttractorParams(a);
+    const { loopNb } = getAttractorParams(a);
     object.instantDraw(selectedAttractor, loopNb);
-    object.anchor.scale.set(scale, scale, scale);
-    scene = createPreview(`${tools.capitalize(a)} Attractor`, object.anchor);
-    previewScenes['attractor'][a] = scene;
+    const fixScale = 0.03;
+    object.anchor.scale.set(fixScale, fixScale, fixScale);
+    scene = createPreview(`${tools.capitalize(a)} Attractor`, attractorGroup);
+    previewScenes["attractor"][a] = scene;
     allPreviewScenes.push(scene);
   });
 
@@ -334,24 +359,24 @@ async function createAllPreviews() {
   object.geneticAlgorithmWithAdaptiveLandscape(400, 200, 0.1);
   object.anchor.scale.set(1 / 8.5, 1 / 8.5, 1 / 8.5);
   object.anchor.position.set(0, -0.5, 0);
-  scene = createPreview('Fitness Landscape', object.anchor);
-  previewScenes['fitness-landscape'] = scene;
+  scene = createPreview("Fitness Landscape", object.anchor);
+  previewScenes["fitness-landscape"] = scene;
   allPreviewScenes.push(scene);
 
   // Trees
   object = Sakura(4, control);
   object.anchor.scale.set(1 / 5.5, 1 / 5.5, 1 / 5.5);
   object.anchor.position.set(0, -0.7, 0);
-  scene = createPreview('Tree', object.anchor);
-  previewScenes['tree'] = scene;
+  scene = createPreview("Tree", object.anchor);
+  previewScenes["tree"] = scene;
   allPreviewScenes.push(scene);
 
   // TSP
   object = new TSP();
   object.generate();
   object.anchor.scale.set(1 / 50, 1 / 50, 1 / 50);
-  scene = createPreview('TSP', object.anchor);
-  previewScenes['tsp'] = scene;
+  scene = createPreview("TSP", object.anchor);
+  previewScenes["tsp"] = scene;
   allPreviewScenes.push(scene);
 
   // Boids
@@ -360,11 +385,14 @@ async function createAllPreviews() {
   object.anchor.scale.set(1 / 20, 1 / 20, 1 / 20);
   object.anchor.remove(object.hitbox.mesh);
   previewBoids = object;
-  scene = createPreview('Boids', object.anchor);
-  previewScenes['boids'] = scene;
+  scene = createPreview("Boids", object.anchor);
+  previewScenes["boids"] = scene;
   allPreviewScenes.push(scene);
 
-  previewRenderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  previewRenderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+  });
   previewRenderer.setPixelRatio(window.devicePixelRatio);
   previewRenderer.setClearColor(0x6041d3, 0);
   previewRenderer.setScissorTest(true);
@@ -478,8 +506,9 @@ function addObject(intersect) {
       break;
 
     case "tree":
-      const randomColor = sakuraColors[Math.floor(Math.random() * sakuraColors.length)];
-      object = Sakura(4, control, randomColor, 0x1B1002);
+      const randomColor =
+        sakuraColors[Math.floor(Math.random() * sakuraColors.length)];
+      object = Sakura(4, control, randomColor, 0x1b1002);
       scaleFactor = scaleFactor / 2;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
       object = placeObject(object, intersect, false);
@@ -526,11 +555,7 @@ function placeObject(object, intersect, isCentered) {
 
   let finalPosition = intersect.point.add(intersect.face.normal);
   if (isCentered) {
-    finalPosition
-      .divideScalar(50)
-      .floor()
-      .multiplyScalar(50)
-      .addScalar(25);
+    finalPosition.divideScalar(50).floor().multiplyScalar(50).addScalar(25);
   }
   object.anchor.position.add(finalPosition);
   // object.anchor.position.copy(intersect.point).add(intersect.face.normal);
@@ -576,15 +601,17 @@ function updateSize() {
 }
 
 function previewRender() {
-  if (currentPreviewScene.name === 'Boids') {
+  if (currentPreviewScene.name === "Boids") {
     previewBoids.update();
     previewBoids.render();
   }
   // Hide other divs
-  allPreviewScenes.filter(s => s !== currentPreviewScene).forEach(s => {
-    s.userData.root.style.display = 'none';
-  });
-  currentPreviewScene.userData.root.style.display = 'inline';
+  allPreviewScenes
+    .filter((s) => s !== currentPreviewScene)
+    .forEach((s) => {
+      s.userData.root.style.display = "none";
+    });
+  currentPreviewScene.userData.root.style.display = "inline";
 
   updateSize();
   canvas.style.transform = `translateY(${window.scrollY}px)`;
@@ -607,7 +634,10 @@ function animate() {
     continuousFrames++;
   }
 
-  if (currentPreviewScene && currentPreviewScene.userData.element.display !== 'none') {
+  if (
+    currentPreviewScene &&
+    currentPreviewScene.userData.element.display !== "none"
+  ) {
     // console.log(currentPreviewScene);
     previewRender();
   }
@@ -624,60 +654,67 @@ buttons.forEach((button) => {
     buttons.forEach((btn) => {
       btn.classList.remove("active");
       // btn.style.backgroundColor = "darkblue";
-
     });
 
     // Ajouter la classe "active" au bouton sélectionné
     this.classList.add("active");
-
   });
 });
 
 //Card dynamique pour la légende
 
-const dynamicContentDiv = document.querySelector('.dynamic-content', 'prev');
+const dynamicContentDiv = document.querySelector(".dynamic-content", "prev");
 buttons.forEach((button) => {
-  button.addEventListener('mouseover', function () {
+  button.addEventListener("mouseover", function () {
     const buttonValue = this.value;
 
     console.log(`Hovering ${buttonValue}`);
     // Mettre à jour le contenu en fonction de la valeur du bouton
     switch (buttonValue) {
-      case 'sponge':
-        dynamicContentDiv.innerHTML = "<span class='aspect'>🧽 L'architecte s'est laissé guider par la fascinante géométrie de la Menger Sponge pour concevoir ces magnifiques immeubles, transformant ainsi une source d'inspiration infinie en une réalité architecturale extraordinaire.</span>";
+      case "sponge":
+        dynamicContentDiv.innerHTML =
+          "<span class='aspect'>🧽 L'architecte s'est laissé guider par la fascinante géométrie de la Menger Sponge pour concevoir ces magnifiques immeubles, transformant ainsi une source d'inspiration infinie en une réalité architecturale extraordinaire.</span>";
         break;
-      case 'attractor':
-        dynamicContentDiv.innerHTML = "<span class='aspect'>🌌 Les attracteurs étranges ont donné naissance à de magnifiques galaxies dans nos ciels étoilés, où les lois de la physique se mêlent à l'art pour créer des constellations mystérieuses et captivantes !</span>";
+      case "attractor":
+        dynamicContentDiv.innerHTML =
+          "<span class='aspect'>🌌 Les attracteurs étranges ont donné naissance à de magnifiques galaxies dans nos ciels étoilés, où les lois de la physique se mêlent à l'art pour créer des constellations mystérieuses et captivantes !</span>";
         break;
-      case 'fitness-landscape':
-        dynamicContentDiv.innerHTML = "<span class='aspect'>🏔️ Nos ingénieurs paysagistes ont conçu une 'Fitness Map' innovante qui a transformé nos paysages en de superbes reliefs, créant ainsi des sommets majestueux pour les amateurs d'aventure.</span>";
+      case "fitness-landscape":
+        dynamicContentDiv.innerHTML =
+          "<span class='aspect'>🏔️ Nos ingénieurs paysagistes ont conçu une 'Fitness Map' innovante qui a transformé nos paysages en de superbes reliefs, créant ainsi des sommets majestueux pour les amateurs d'aventure.</span>";
         break;
-      case 'tree':
-        dynamicContentDiv.innerHTML = "<span class='aspect'>🌳🌸 Nos jardiniers ont conçut des L-Systems pour transformer vos écrans en jardins numériques où les pixels fleurissent en branches et fleurs de cerisier japonais.</span>";
+      case "tree":
+        dynamicContentDiv.innerHTML =
+          "<span class='aspect'>🌳🌸 Nos jardiniers ont conçut des L-Systems pour transformer vos écrans en jardins numériques où les pixels fleurissent en branches et fleurs de cerisier japonais.</span>";
         break;
-      case 'tsp':
-        dynamicContentDiv.innerHTML = "<span class='aspect'>✨ Les TSP se transforment en constellations ! Transformez vos problèmes de voyageurs de commerce en étoiles scintillantes et illuminez le ciel de votre monde.</span>";
+      case "tsp":
+        dynamicContentDiv.innerHTML =
+          "<span class='aspect'>✨ Les TSP se transforment en constellations ! Transformez vos problèmes de voyageurs de commerce en étoiles scintillantes et illuminez le ciel de votre monde.</span>";
         break;
-      case 'boids':
-        dynamicContentDiv.innerHTML = "<span class='aspect'>🚀 Les Boids font les stars ! En les introduisant dans ton monde, tu donnes vie à un univers astral incroyable ! Imaginez vous dans Star Wars, mais avec des boids qui planent plutôt que des vaisseaux intergalactiques…</span>";
+      case "boids":
+        dynamicContentDiv.innerHTML =
+          "<span class='aspect'>🚀 Les Boids font les stars ! En les introduisant dans ton monde, tu donnes vie à un univers astral incroyable ! Imaginez vous dans Star Wars, mais avec des boids qui planent plutôt que des vaisseaux intergalactiques…</span>";
         break;
       default:
-        dynamicContentDiv.innerHTML = ''; // Effacer le contenu par défaut si aucun bouton n'est survolé
+        dynamicContentDiv.innerHTML = ""; // Effacer le contenu par défaut si aucun bouton n'est survolé
     }
 
-    currentPreviewScene = (buttonValue === 'attractor') ? previewScenes[buttonValue][selectedAttractor] : previewScenes[buttonValue];
+    currentPreviewScene =
+      buttonValue === "attractor"
+        ? previewScenes[buttonValue][selectedAttractor]
+        : previewScenes[buttonValue];
     // console.log(currentPreviewScene);
 
     // Afficher la div si elle est cachée
-    card.style.display = 'inline-block';
-    prev.style.display = 'inline-block';
+    card.style.display = "inline-block";
+    prev.style.display = "inline-block";
   });
   // Sortie du survol des boutons selectObject
-  button.addEventListener('mouseout', function () {
+  button.addEventListener("mouseout", function () {
     // Cacher la div lorsque rien n'est survolé
     currentPreviewScene = undefined;
-    card.style.display = 'none';
-    prev.style.display = 'none';
+    card.style.display = "none";
+    prev.style.display = "none";
   });
 });
 
@@ -693,9 +730,12 @@ function animatePV(scene) {
   const rect = element.getBoundingClientRect();
 
   // check if it's offscreen. If so skip it
-  if (rect.bottom < 0 || rect.top > previewRenderer.domElement.clientHeight ||
-    rect.right < 0 || rect.left > previewRenderer.domElement.clientWidth) {
-
+  if (
+    rect.bottom < 0 ||
+    rect.top > previewRenderer.domElement.clientHeight ||
+    rect.right < 0 ||
+    rect.left > previewRenderer.domElement.clientWidth
+  ) {
     return; // it's off screen
   }
 
