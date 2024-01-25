@@ -25,11 +25,11 @@ const defaults = Object.freeze({
  * @param {number} iterations
  * @returns
  */
-export function Sakura(iterations, control) {
+export function Sakura(iterations, control, fruitColor = 0xf695c3, bodyColor = 0x594d30) {
   let data = {
-    axiom: "m{0x594d30, 0.9, 0} A{0.2}",
+    axiom: `m{${bodyColor}, 0.9, 0} A{0.2}`,
     productions:
-      "A{r} -> l{0.2, r, r} +x +y +z [ [ A{r/2} ] -x A{r/2} ] -x -y -z l{0.2, r, r} [ -x l{0.2, r, r/2} A{r/2} m{0xf695c3, 0.7, 0} sphere ] +x A{r/2}\nl{a, b, c} -> l{a*2.5, b, c}\nl{a, b, c} -> l{a*2, b, c}\nsphere -> sphere{random()/7+0.1}",
+      `A{r} -> l{0.2, r, r} +x +y +z [ [ A{r/2} ] -x A{r/2} ] -x -y -z l{0.2, r, r} [ -x l{0.2, r, r/2} A{r/2} m{${fruitColor}, 0.7, 0} sphere ] +x A{r/2}\nl{a, b, c} -> l{a*2.5, b, c}\nl{a, b, c} -> l{a*2, b, c}\nsphere -> sphere{random()/7+0.1}`,
   };
 
   let turtle = new Turtle();
