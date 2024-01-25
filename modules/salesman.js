@@ -285,7 +285,7 @@ class TSP {
 		for (let i = 0; i < this.environment.points.length; i++) {
 			createCity(this.environment.points[i], __SETTINGS__.pointColor);
 		}
-		createCity(this.environment.start, 0xff0000);
+		createCity(this.environment.start, 0xf6c94f);
 	}
 
 	reset() {
