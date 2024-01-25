@@ -33,7 +33,7 @@ h1{
   bottom: 0;
   left: 0;
   right: 0;
-  height: 4rem;
+  height: 5rem;
   margin: auto;
   padding: 1rem;
 }
@@ -64,7 +64,11 @@ h1{
   transform: scale(1.1);
 }
 
-.aspect{
+.selectObject.active{
+  background-color: var(--color-orange);
+}
+
+/* .aspect{
   background-color: var(--color-pink);
   color: var(--color-temp-bg);
   display: inline-block;
@@ -81,15 +85,7 @@ h1{
   border-radius: 1.5em;
   display: none;
 }
-
-@keyframes opac {
-  from{
-    opacity: 0;
-  }
-  to{
-    opacity: 1;
-  }
-}
+ */
 
 .header {
   background-color: var(--color-bright-purple);
@@ -146,4 +142,44 @@ h1{
 
 .clear{
   background-color: var(--color-dark-blue);
+}
+
+.selectAttractor{
+  background-color: var(--color-dark-blue);
+  color:var(--color-temp-bg);
+  padding:0.5em;
+  border:solid 2px white;
+  border-radius: 1em;
+  font-size: 0.8em;
+}
+
+.card{
+  color: var(--color-temp-bg);
+  display: inline-block;
+  text-align: center;
+  animation: opac 0.7s;
+  height:auto;
+  width:25em;
+  font-size: 1.2em;
+  top:7em;
+  left:2em;
+  position: absolute;
+  padding:0.5em;
+  border-radius: 1.5em;
+  display: none;
+  background: rgba(254, 250, 239, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6.3px);
+  -webkit-backdrop-filter: blur(6.3px);
+  border: 1px solid rgba(254, 250, 239, 0.47);
+}
+
+@keyframes opac {
+  from{
+    opacity: 0;
+  }
+  to{
+    opacity: 1;
+  }
 }

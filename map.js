@@ -458,3 +458,58 @@ function animate() {
   }
   requestAnimationFrame(animate);
 }
+
+//Changer couleur quand bouton actif
+document.querySelectorAll(".selectObject").forEach((button) => {
+  button.addEventListener("click", function () {
+    selectedObject = this.value;
+
+    // Retirer la classe "active" de tous les boutons
+    document.querySelectorAll(".selectObject").forEach((btn) => {
+      btn.classList.remove("active");
+    });
+
+    // Ajouter la classe "active" au bouton sélectionné
+    this.classList.add("active");
+
+  });
+});
+
+//Card dynamique pour la légende
+
+const dynamicContentDiv = document.querySelector('.dynamic-content');
+document.querySelectorAll('.selectObject').forEach((button) => {
+  button.addEventListener('mouseover', function () {
+    const buttonValue = this.value;
+    // Mettre à jour le contenu en fonction de la valeur du bouton
+    switch (buttonValue) {
+      case 'sponge':
+        dynamicContentDiv.innerHTML = "<span class='aspect'>🧽 L'architecte s'est laissé guider par la fascinante géométrie de la Menger Sponge pour concevoir ces magnifiques immeubles, transformant ainsi une source d'inspiration infinie en une réalité architecturale extraordinaire.</span>";
+        break;
+      case 'attractor':
+        dynamicContentDiv.innerHTML = "<span class='aspect'>🌌 Les attracteurs étranges ont donné naissance à de magnifiques galaxies dans nos ciels étoilés, où les lois de la physique se mêlent à l'art pour créer des constellations mystérieuses et captivantes !</span>";
+        break;
+        case 'fitness-landscape':
+        dynamicContentDiv.innerHTML = "<span class='aspect'>🏔️ Nos ingénieurs paysagistes ont conçu une 'Fitness Map' innovante qui a transformé nos paysages en de superbes reliefs, créant ainsi des sommets majestueux pour les amateurs d'aventure.</span>";
+        break;
+        case 'tree':
+          dynamicContentDiv.innerHTML = "<span class='aspect'>🌳🌸 Nos jardiniers ont conçut des L-Systems pour transformer vos écrans en jardins numériques où les pixels fleurissent en branches et fleurs de cerisier japonais.</span>";
+          break;
+          case 'tsp':
+          dynamicContentDiv.innerHTML = "<span class='aspect'>tsp</span>";
+          break;
+          case 'boids':
+          dynamicContentDiv.innerHTML = "<span class='aspect'>boids</span>";
+          break;
+      default:
+        dynamicContentDiv.innerHTML = ''; // Effacer le contenu par défaut si aucun bouton n'est survolé
+    }
+    // Afficher la div si elle est cachée
+    document.querySelector('.card').style.display = 'inline-block';
+  });
+    // Sortie du survol des boutons selectObject
+    button.addEventListener('mouseout', function () {
+      // Cacher la div lorsque rien n'est survolé
+      document.querySelector('.card').style.display = 'none';
+    });
+});
