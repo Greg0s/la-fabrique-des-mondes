@@ -639,10 +639,10 @@ document.querySelectorAll('.selectObject').forEach((button) => {
         dynamicContentDiv.innerHTML = "<span class='aspect'>🌳🌸 Nos jardiniers ont conçut des L-Systems pour transformer vos écrans en jardins numériques où les pixels fleurissent en branches et fleurs de cerisier japonais.</span>";
         break;
       case 'tsp':
-        dynamicContentDiv.innerHTML = "<span class='aspect'>tsp</span>";
+        dynamicContentDiv.innerHTML = "<span class='aspect'>✨ Les TSP se transforment en constellations ! Transformez vos problèmes de voyageurs de commerce en étoiles scintillantes et illuminez le ciel de votre monde.</span>";
         break;
       case 'boids':
-        dynamicContentDiv.innerHTML = "<span class='aspect'>boids</span>";
+        dynamicContentDiv.innerHTML = "<span class='aspect'>🚀 Les Boids font les stars ! En les introduisant dans ton monde, tu donnes vie à un univers astral incroyable ! Imaginez vous dans Star Wars, mais avec des boids qui planent plutôt que des vaisseaux intergalactiques…</span>";
         break;
       default:
         dynamicContentDiv.innerHTML = ''; // Effacer le contenu par défaut si aucun bouton n'est survolé
