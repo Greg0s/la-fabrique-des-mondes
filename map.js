@@ -349,8 +349,9 @@ async function createAllPreviews() {
     object.instantDraw(selectedAttractor, loopNb);
     const fixScale = 0.03;
     object.anchor.scale.set(fixScale, fixScale, fixScale);
-    scene = createPreview(`${tools.capitalize(a)} Attractor`, attractorGroup);
+    scene = createPreview(`${tools.capitalize(a)} Attractor`, object.anchor);
     previewScenes["attractor"][a] = scene;
+    console.log(`Pushed ${scene.name} in attractor ${a}`);
     allPreviewScenes.push(scene);
   });
 
@@ -558,15 +559,6 @@ function placeObject(object, intersect, isCentered) {
     finalPosition.divideScalar(50).floor().multiplyScalar(50).addScalar(25);
   }
   object.anchor.position.add(finalPosition);
-  // object.anchor.position.copy(intersect.point).add(intersect.face.normal);
-
-  // if (isCentered) {
-  //   object.anchor.position
-  //     .divideScalar(50)
-  //     .floor()
-  //     .multiplyScalar(50)
-  //     .addScalar(25);
-  // }
 
   return object;
 }
@@ -589,6 +581,7 @@ function onDocumentKeyUp(event) {
 
 function render() {
   renderer.render(mainScene, camera);
+  console.log(renderer.info.render);
 }
 
 function updateSize() {
@@ -616,13 +609,14 @@ function previewRender() {
   updateSize();
   canvas.style.transform = `translateY(${window.scrollY}px)`;
 
+  console.log(`Animating ${currentPreviewScene.name}`);
   animatePV(currentPreviewScene);
 }
 
 function animate() {
-  if (eventCounts > 0 || (continuousFlag && continuousFrames > 2)) {
+  if (eventCounts > 0 || (continuousFlag && continuousFrames >= 0)) {
     updatable.forEach((u) => {
-      for (let i = 0; i < continuousFrames; i++) {
+      for (let i = 0; i <= continuousFrames; i++) {
         u.update();
       }
       u.render();
@@ -668,7 +662,6 @@ buttons.forEach((button) => {
   button.addEventListener("mouseover", function () {
     const buttonValue = this.value;
 
-    console.log(`Hovering ${buttonValue}`);
     // Mettre à jour le contenu en fonction de la valeur du bouton
     switch (buttonValue) {
       case "sponge":
@@ -703,7 +696,6 @@ buttons.forEach((button) => {
       buttonValue === "attractor"
         ? previewScenes[buttonValue][selectedAttractor]
         : previewScenes[buttonValue];
-    // console.log(currentPreviewScene);
 
     // Afficher la div si elle est cachée
     card.style.display = "inline-block";
