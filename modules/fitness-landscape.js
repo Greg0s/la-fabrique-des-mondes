@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Hitbox } from "../utils";
 
 function getRandomColor() {
-  const colors = [0x5112b8, 0x660fe3, 0x6e34ea, 0xf6c94f];
+  const colors = [0x5112b8, 0xff6fff, 0x6e34ea, 0xf6c94f];
   return colors[Math.floor(Math.random() * 4)];
 }
 
