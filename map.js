@@ -102,7 +102,7 @@ let continuousFrames = 0;
 const boidMesh = new THREE.Mesh(
   new THREE.SphereGeometry(1, 8, 8),
   new THREE.MeshPhongMaterial({
-    color: 0xffffff,
+    color: 0xebc373,
     transparent: true,
     opacity: 0.2,
   })
@@ -111,13 +111,13 @@ boidMesh.add(
   new THREE.Mesh(
     new THREE.SphereGeometry(0.6, 5, 5),
     new THREE.MeshPhongMaterial({
-      color: 0xaaff00,
+      color: 0x660FE3,
       transparent: true,
       opacity: 0.3,
     })
   )
 );
-boidMesh.add(new THREE.PointLight(0xffff99, 100, 3));
+boidMesh.add(new THREE.PointLight(0xebc373, 100, 3));
 
 /* END ADDED PARAMS*/
 
@@ -343,6 +343,7 @@ async function createAllPreviews() {
 
   // Attractors
   previewScenes["attractor"] = {};
+  
   selectableAttractors.forEach((a) => {
     object = new StrangeAttractor(control);
     const { loopNb } = getAttractorParams(a);
@@ -662,6 +663,7 @@ buttons.forEach((button) => {
   button.addEventListener("mouseover", function () {
     const buttonValue = this.value;
 
+    console.log(`Hovering ${buttonValue}`);
     // Mettre à jour le contenu en fonction de la valeur du bouton
     switch (buttonValue) {
       case "sponge":
