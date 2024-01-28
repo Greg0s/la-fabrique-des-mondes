@@ -680,7 +680,7 @@ buttons.forEach((button) => {
         break;
       case "tree":
         dynamicContentDiv.innerHTML =
-          "<span class='aspect'>🌳🌸 Nos jardiniers ont conçut des L-Systems pour transformer vos écrans en jardins numériques où les pixels fleurissent en branches et fleurs de cerisier japonais.</span>";
+          "<span class='aspect'>🌳🌸 Nos jardiniers ont conçu des L-Systems pour transformer vos écrans en jardins numériques où les pixels fleurissent en branches et fleurs de cerisier japonais.</span>";
         break;
       case "tsp":
         dynamicContentDiv.innerHTML =
