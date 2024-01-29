@@ -215,3 +215,61 @@ h1 {
   width: 200px;
   margin-top: 0.5em;
 }
+
+
+body {
+  font-family: Arial, sans-serif;
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+ 
+
+}
+
+.popup-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url(../img/fabriquedemondes.png);
+  background-size: contain; /* Utilisez 'contain' pour s'assurer que l'image est complètement visible */
+  background-repeat: no-repeat;
+  width: auto;
+  height: auto;
+   min-width: 600px; /* Définissez une largeur minimale en pixels si nécessaire */
+  min-height: 300px;
+  padding: 20px;
+  text-align: center;
+  box-shadow:  -20px 20px 20px rgba(0, 0, 0, 0.432);
+}
+
+.popup-content > div {
+  background-color: white; /* Fond blanc pour le texte */
+  padding-left: 15px;
+  padding-right: 15px; /* Ajustez le rembourrage selon vos besoins */
+  border-radius: 15px; /* Ajustez la bordure du fond du texte si nécessaire */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  width: 40%;
+ 
+}
+
+.popup-content button {
+  position: absolute;
+  bottom: 30px; /* Ajustez la distance par rapport au bas du popup */
+  right: 80px; /* Ajustez la distance par rapport à la droite du popup */
+  background-color: white;
+  border: none;
+  padding : 5px 10px;
+  border-radius: 10px;
+
+}

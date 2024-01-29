@@ -26,6 +26,8 @@ class UI {
     this.headerBar.appendChild(myTitle);
     body.appendChild(this.headerBar);
   }
+ 
+
 }
 
 
