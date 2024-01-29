@@ -346,9 +346,9 @@ async function createAllPreviews() {
 
   selectableAttractors.forEach((a) => {
     object = new StrangeAttractor(control);
-    const { loopNb } = getAttractorParams(a);
+    const { loopNb, scale } = getAttractorParams(a);
     object.instantDraw(a, loopNb);
-    const fixScale = 0.03;
+    const fixScale = 0.009 * scale;
     object.anchor.scale.set(fixScale, fixScale, fixScale);
     scene = createPreview(`${tools.capitalize(a)} Attractor`, object.anchor);
     previewScenes["attractor"][a] = scene;
