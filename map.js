@@ -16,6 +16,7 @@ import {
 } from "/modules";
 import { getAttractorParams } from "./utils/attractors";
 import BoidEnvironment from "./modules/boids";
+import { TSPRandomXZ, TSPRandomY } from "./utils/tools";
 
 const selectableValues = [
   "tree",
@@ -548,7 +549,12 @@ function addObject(intersect) {
     case "tsp":
       object = new TSP();
       object.generate();
-      object.anchor.position.y = Math.random() * 400 + 500;
+      object.anchor.position.x = TSPRandomXZ(intersect.point.x);
+      object.anchor.position.z = TSPRandomXZ(intersect.point.z);
+      object.anchor.position.y = TSPRandomY(
+        intersect.point.x,
+        intersect.point.z
+      );
       scaleFactor = scaleFactor / 3;
       object.anchor.scale.set(scaleFactor, scaleFactor, scaleFactor);
       break;
@@ -565,7 +571,7 @@ function addObject(intersect) {
   }
 
   mainScene.add(object.anchor);
-  objects.push(object, (selectedObject === "sponge") ? true : false);
+  objects.push(object, selectedObject === "sponge" ? true : false);
 
   eventCounts++;
 }
@@ -600,7 +606,7 @@ function onDocumentKeyUp(event) {
 
 function render() {
   renderer.render(mainScene, camera);
-  console.log(renderer.info.render);
+  if (debugMode) console.log(renderer.info.render);
 }
 
 function updateSize() {
