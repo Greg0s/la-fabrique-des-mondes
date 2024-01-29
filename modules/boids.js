@@ -187,7 +187,7 @@ class BoidEnvironment {
    * @param {THREE.Mesh} mesh a mesh copied to each boid created
    * @param {THREE.TransformControls} control
    */
-  constructor(mesh, control) {
+  constructor(mesh, control = undefined) {
     /** @type {Boid[]} */
     this.boids = [];
 

@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Hitbox } from "../utils";
 
 class StrangeAttractor {
-  constructor(control) {
+  constructor(control = undefined) {
     this.settings = {
       dt: 0.01,
       positions: [],

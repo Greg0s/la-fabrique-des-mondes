@@ -25,7 +25,7 @@ const defaults = Object.freeze({
  * @param {number} iterations
  * @returns
  */
-export function Sakura(iterations, control, fruitColor = 0xf695c3, bodyColor = 0x594d30) {
+export function Sakura(iterations, control = undefined, fruitColor = 0xf695c3, bodyColor = 0x594d30) {
   let data = {
     axiom: `m{${bodyColor}, 0.9, 0} A{0.2}`,
     productions:

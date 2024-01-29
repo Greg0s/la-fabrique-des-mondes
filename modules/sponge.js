@@ -10,7 +10,7 @@ function pickRandomColor() {
 }
 
 class Sponge {
-  constructor(control) {
+  constructor(control = undefined) {
     this.anchor = new THREE.Object3D();
 
     this.hitbox;

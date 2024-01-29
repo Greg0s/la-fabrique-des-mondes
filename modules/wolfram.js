@@ -42,7 +42,7 @@ class Wolfram {
 
   drawAllGen(color) {
     let planeGeometry = new THREE.PlaneGeometry(size, size);
-    let planeMaterial = new THREE.MeshBasicMaterial({
+    let planeMaterial = new THREE.MeshPhongMaterial({
       color: color,
       side: THREE.DoubleSide,
     });

@@ -30,6 +30,10 @@ class Hitbox {
   }
 
   handler(control, hitbox, mesh) {
+    if (control === undefined) {
+      return;
+    }
+
     control.addEventListener("dragging-changed", (event) => {
       if (event.value) {
         control.addEventListener("objectChange", () => {

@@ -7,7 +7,7 @@ function getRandomColor() {
 }
 
 class FitnessLandscape {
-  constructor(control) {
+  constructor(control = undefined) {
     this.settings = {
       colors: [],
       gridSize: 10,

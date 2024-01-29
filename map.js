@@ -2,8 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { saveScreenshot, Hitbox } from "/utils";
-import tools from "/utils/tools";
-import { createPreview } from "/utils/preview";
+import { createPreview, createAllPreviews } from "/utils/preview";
 
 // MODULES
 import {
@@ -26,29 +25,20 @@ const selectableValues = [
   "tsp",
   "boids",
 ];
-const selectableAttractors = [
-  "lorenz",
-  "rossler",
-  "aizawa",
-  "arneodo",
-  "sprottB",
-  "sprottLinzF",
-  "halvorsen",
-];
 
 let camera, mainScene, renderer;
-let previewRenderer, currentPreviewScene;
+let currentPreviewScene;
 let canvas = document.getElementById("c");
 let plane, planeHitbox;
 let pointer,
   raycaster = false;
-let previewScenes = {};
-let allPreviewScenes = []; // cache
+
+// Preview
+let previewScenes, allPreviewScenes, previewRenderer, previewBoids;
 
 let rollOverMesh, rollOverMaterial;
 let updatable = [];
 let ground;
-let previewBoids;
 
 let eventCounts = 0;
 
@@ -333,86 +323,20 @@ function init() {
   setListeners().then(() => console.log("Built UI Listeners."));
 
   setTimeout(
-    async () =>
-      createAllPreviews().then(() => console.log("Preview scenes loaded.")),
+    async () => {
+      let result = await createAllPreviews(canvas, boidMesh);
+      previewScenes = result.previewScenes;
+      allPreviewScenes = result.allPreviewScenes;
+      previewRenderer = result.previewRenderer;
+      previewBoids = result.previewBoids;
+      console.log("Preview scenes loaded.");
+    },
     2000
   );
 
   requestAnimationFrame(animate);
 
   console.log("Ready!");
-}
-
-async function createAllPreviews() {
-  let scene;
-  // Sponge
-  let object = new Sponge(control);
-  object.create(2);
-  object.anchor.remove(object.hitbox.mesh);
-  object.centerPointLight.intensity = 1;
-  scene = createPreview("Sponge", object.anchor);
-  previewScenes["sponge"] = scene;
-  allPreviewScenes.push(scene);
-
-  // Attractors
-  previewScenes["attractor"] = {};
-
-  selectableAttractors.forEach((a) => {
-    object = new StrangeAttractor(control);
-    const { loopNb, scale } = getAttractorParams(a);
-    object.instantDraw(a, loopNb);
-    const fixScale = 0.009 * scale;
-    object.anchor.scale.set(fixScale, fixScale, fixScale);
-    scene = createPreview(`${tools.capitalize(a)} Attractor`, object.anchor);
-    previewScenes["attractor"][a] = scene;
-    console.log(`Pushed ${scene.name} in attractor ${a}`);
-    allPreviewScenes.push(scene);
-  });
-
-  // Fitness Landscape
-  object = new FitnessLandscape(control);
-  object.geneticAlgorithmWithAdaptiveLandscape(400, 200, 0.1);
-  object.anchor.scale.set(1 / 8.5, 1 / 8.5, 1 / 8.5);
-  object.anchor.position.set(0, -0.5, 0);
-  scene = createPreview("Fitness Landscape", object.anchor);
-  previewScenes["fitness-landscape"] = scene;
-  allPreviewScenes.push(scene);
-
-  // Trees
-  object = Sakura(4, control);
-  object.anchor.scale.set(1 / 5.5, 1 / 5.5, 1 / 5.5);
-  object.anchor.position.set(0, -0.7, 0);
-  object.light.intensity = 1;
-  scene = createPreview("Tree", object.anchor);
-  previewScenes["tree"] = scene;
-  allPreviewScenes.push(scene);
-
-  // TSP
-  object = new TSP();
-  object.generate();
-  object.anchor.scale.set(1 / 50, 1 / 50, 1 / 50);
-  scene = createPreview("TSP", object.anchor);
-  previewScenes["tsp"] = scene;
-  allPreviewScenes.push(scene);
-
-  // Boids
-  object = new BoidEnvironment(boidMesh, control);
-  object.create();
-  object.anchor.scale.set(1 / 20, 1 / 20, 1 / 20);
-  object.anchor.remove(object.hitbox.mesh);
-  previewBoids = object;
-  scene = createPreview("Boids", object.anchor);
-  previewScenes["boids"] = scene;
-  allPreviewScenes.push(scene);
-
-  previewRenderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    antialias: true,
-  });
-  previewRenderer.setPixelRatio(window.devicePixelRatio);
-  previewRenderer.setClearColor(0x6041d3, 0);
-  previewRenderer.setScissorTest(true);
-  eventCounts++;
 }
 
 function onWindowResize() {
