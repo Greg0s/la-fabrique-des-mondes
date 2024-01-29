@@ -56,12 +56,17 @@ let buttons, card, prev;
 const objects = {
   anchors: [],
   hitbox: [],
+  spongehitbox: [],
 
-  push(o) {
+  push(o, isSponge = false) {
     this.anchors.push(o.anchor);
 
     if (o.hitbox) {
       this.hitbox.push(o.hitbox.mesh);
+    }
+
+    if (isSponge) {
+      this.spongehitbox.push(o.hitbox.mesh);
     }
   },
 
@@ -74,6 +79,13 @@ const objects = {
       Hitbox.removeInstance(mesh);
       updatable = updatable.filter((a) => a.anchor !== removed[0]);
       scene.remove(removed[0]);
+    }
+
+    // For sponge hitbox
+    let j = this.spongehitbox.findIndex((m) => m === mesh);
+
+    if (j !== -1) {
+      this.spongehitbox.splice(i, 1);
     }
   },
 
@@ -204,7 +216,7 @@ function init() {
   mainScene.add(plane);
 
   planeHitbox = new Hitbox(geometry);
-  objects.push({ anchor: plane, hitbox: planeHitbox });
+  objects.push({ anchor: plane, hitbox: planeHitbox }, true);
 
   // lights
 
@@ -420,7 +432,7 @@ function onPointerMove(event) {
     raycaster.setFromCamera(pointer, camera);
 
     const intersects = raycaster.intersectObjects(
-      selectedObject === "sponge" ? objects.hitbox : [planeHitbox.mesh],
+      selectedObject === "sponge" ? objects.spongehitbox : [planeHitbox.mesh],
       false
     );
 
@@ -451,22 +463,28 @@ function onPointerDown(event) {
   raycaster.setFromCamera(pointer, camera);
 
   if (mode === "edit") {
-    const intersects = raycaster.intersectObjects(
-      selectedObject === "sponge" ? objects.hitbox : [planeHitbox.mesh],
-      false
-    );
+    if (event.button === 0) {
+      const intersects = raycaster.intersectObjects(
+        selectedObject === "sponge" ? objects.spongehitbox : [planeHitbox.mesh],
+        false
+      );
 
-    // Left click to add
-    if (intersects.length > 0) {
-      const intersect = intersects[0];
+      // Left click to add
+      if (intersects.length > 0) {
+        const intersect = intersects[0];
 
-      if (event.button === 0) {
         addObject(intersect);
-      } else if (event.button === 2) {
+      }
+    } else if (event.button === 2) {
+      const intersects = raycaster.intersectObjects(objects.hitbox, false);
+
+      // Left click to add
+      if (intersects.length > 0) {
+        const intersect = intersects[0];
         removeObject(intersect);
       }
-      eventCounts++;
     }
+    eventCounts++;
   }
 }
 
@@ -547,7 +565,7 @@ function addObject(intersect) {
   }
 
   mainScene.add(object.anchor);
-  objects.push(object);
+  objects.push(object, (selectedObject === "sponge") ? true : false);
 
   eventCounts++;
 }
