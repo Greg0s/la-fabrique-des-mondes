@@ -111,7 +111,7 @@ boidMesh.add(
   new THREE.Mesh(
     new THREE.SphereGeometry(0.6, 5, 5),
     new THREE.MeshPhongMaterial({
-      color: 0x660FE3,
+      color: 0x660fe3,
       transparent: true,
       opacity: 0.3,
     })
@@ -343,11 +343,11 @@ async function createAllPreviews() {
 
   // Attractors
   previewScenes["attractor"] = {};
-  
+
   selectableAttractors.forEach((a) => {
     object = new StrangeAttractor(control);
     const { loopNb } = getAttractorParams(a);
-    object.instantDraw(selectedAttractor, loopNb);
+    object.instantDraw(a, loopNb);
     const fixScale = 0.03;
     object.anchor.scale.set(fixScale, fixScale, fixScale);
     scene = createPreview(`${tools.capitalize(a)} Attractor`, object.anchor);
