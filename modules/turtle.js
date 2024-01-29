@@ -407,5 +407,6 @@ export class Turtle {
     // Create hitbox & link to mesh
     this.hitbox = new Hitbox();
     this.hitbox.handler(control, this.hitbox.mesh, this.anchor);
+    this.anchor.add(this.hitbox.mesh);
   }
 }
