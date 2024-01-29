@@ -382,6 +382,7 @@ async function createAllPreviews() {
   object = Sakura(4, control);
   object.anchor.scale.set(1 / 5.5, 1 / 5.5, 1 / 5.5);
   object.anchor.position.set(0, -0.7, 0);
+  object.light.intensity = 1;
   scene = createPreview("Tree", object.anchor);
   previewScenes["tree"] = scene;
   allPreviewScenes.push(scene);

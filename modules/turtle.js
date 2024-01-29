@@ -29,18 +29,21 @@ export function Sakura(iterations, control, fruitColor = 0xf695c3, bodyColor = 0
   let data = {
     axiom: `m{${bodyColor}, 0.9, 0} A{0.2}`,
     productions:
-      `A{r} -> l{0.2, r, r} +x +y +z [ [ A{r/2} ] -x A{r/2} ] -x -y -z l{0.2, r, r} [ -x l{0.2, r, r/2} A{r/2} m{${fruitColor}, 0.7, 0} sphere ] +x A{r/2}\nl{a, b, c} -> l{a*2.5, b, c}\nl{a, b, c} -> l{a*2, b, c}\nsphere -> sphere{random()/7+0.1}`,
+      `A{r} -> l{0.2, r, r} +x +y +z [ [ A{r/2} ] -x A{r/2} ] -x -y -z l{0.2, r, r} [ -x l{0.2, r, r/2} A{r/2} m{${fruitColor}, 0.7, 0, true} sphere ] +x A{r/2}\n
+      l{a, b, c} -> l{a*2.5, b, c}\n
+      l{a, b, c} -> l{a*2, b, c}\n
+      sphere -> sphere{random()/7+0.1}`,
   };
 
   let turtle = new Turtle();
-  turtle.generate(iterate(data.axiom, data.productions, iterations), control);
+  turtle.generate(iterate(data.axiom, data.productions, iterations), fruitColor, control);
 
   return turtle;
 }
 
 export class Turtle {
   scene;
-  lights;
+  light;
   material;
   materials;
   geometries;
@@ -63,6 +66,9 @@ export class Turtle {
     this.tmpVec = new Vector3();
 
     this.reset();
+
+    this.count = 0;
+    this.fruitMass = new THREE.Vector3();
   }
 
   getPos() {
@@ -108,6 +114,7 @@ export class Turtle {
     color = 0xffffff,
     roughness = 0.1,
     metalness = 0.1,
+    emissive = false,
     flatShading = false,
     fog = true,
     wireframe = false,
@@ -126,6 +133,8 @@ export class Turtle {
       transparent,
       opacity,
       side: s[side],
+      emissive: color,
+      emissiveIntensity: (emissive) ? 1.2: 0
     });
     this.materials.push(this.material);
     return this;
@@ -278,9 +287,13 @@ export class Turtle {
     mesh.geometry.rotateX(Math.PI / 2);
     mesh.lookAt(this.getDir());
     mesh.position.copy(this.getPos());
+    
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     this.group.add(mesh);
+
+    this.count ++;
+    this.fruitMass.add(this.getPos());
 
     return this;
   }
@@ -389,7 +402,7 @@ export class Turtle {
     }
   }
 
-  generate(commands, control) {
+  generate(commands, fruitColor, control) {
     this.setDefaults(Turtle.defaults);
 
     this.reset();
@@ -408,5 +421,11 @@ export class Turtle {
     this.hitbox = new Hitbox();
     this.hitbox.handler(control, this.hitbox.mesh, this.anchor);
     this.anchor.add(this.hitbox.mesh);
+
+    // Artificial light
+    let pointLight = new THREE.PointLight(fruitColor, 5000, 0, 1.5);
+    pointLight.position.copy(this.fruitMass.divideScalar(Math.max(this.count, 1)));
+    this.anchor.add(pointLight);
+    this.light = pointLight;
   }
 }
