@@ -1,21 +1,21 @@
 /* Fonts */
-@import url("https://fonts.googleapis.com/css2?family=Vina+Sans&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;700;800&display=swap");
 
 :root {
   --color-dark-blue: darkblue;
   --color-purple: purple;
   --color-pink: #cf89f2;
-  --color-bright-purple: #660FE3;
+  --color-bright-purple: #660fe3;
   --color-orange: #ebc373;
   --color-temp-bg: #fefaef;
   --color-white: #ffffff;
 }
 
-body {
+body,
+button {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 h1 {
@@ -86,8 +86,7 @@ h1 {
   justify-content: space-between;
   align-items: center;
   color: var(--color-white);
-  /* font-family: "Vina Sans", sans-serif; */
-  font-family: 'Major Mono Display', monospace;
+  font-family: "Major Mono Display", monospace;
   font-size: 2em;
 }
 
@@ -174,7 +173,7 @@ h1 {
   position: absolute;
   /* display: none;*/
   top: 1em;
-  left:2em;
+  left: 2em;
   z-index: 1;
   /* width: 15em;
   height: 15em; */
@@ -203,22 +202,16 @@ h1 {
   display: none;
 }
 
-.list-item>div:nth-child(1) {
+.list-item > div:nth-child(1) {
   width: 200px;
   height: 200px;
 }
 
-.list-item>div:nth-child(2) {
+.list-item > div:nth-child(2) {
   color: #888;
-  font-family: sans-serif;
   font-size: large;
   width: 200px;
   margin-top: 0.5em;
-}
-
-
-body {
-  font-family: Arial, sans-serif;
 }
 
 .popup {
@@ -228,9 +221,6 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-
- 
-
 }
 
 .popup-content {
@@ -243,11 +233,11 @@ body {
   background-repeat: no-repeat;
   width: auto;
   height: auto;
-   min-width: 600px; /* Définissez une largeur minimale en pixels si nécessaire */
+  min-width: 600px; /* Définissez une largeur minimale en pixels si nécessaire */
   min-height: 300px;
   padding: 20px;
   text-align: center;
-  box-shadow:  -20px 20px 20px rgba(0, 0, 0, 0.432);
+  box-shadow: -20px 20px 20px rgba(0, 0, 0, 0.432);
 }
 
 .popup-content > div {
@@ -260,7 +250,6 @@ body {
   left: 50%;
   transform: translate(-50%, -60%);
   width: 40%;
- 
 }
 
 .popup-content button {
@@ -269,7 +258,9 @@ body {
   right: 80px; /* Ajustez la distance par rapport à la droite du popup */
   background-color: white;
   border: none;
-  padding : 5px 10px;
+  padding: 5px 10px;
   border-radius: 10px;
+}
 
+@media screen and (max-width: 760) {
 }

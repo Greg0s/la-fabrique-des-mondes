@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Generative world</title>
+    <title>La Fabrique des Mondes</title>
     <link rel="stylesheet" type="text/css" href="styles/ui.css" />
     <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
   </head>
@@ -12,18 +12,15 @@
     <div id="popup" class="popup">
       <div class="popup-content">
           <div>
-             
-             
               <p id="popupContent"></p>
-            
           </div>
-          <button onclick="openNewPopup()">Fermer</button>
+          <button>Fermer</button>
       </div>
   </div>
   </div>
     <div class="ui">
       <div class="header">
-        <h1>Generative world</h1>
+        <h1>La Fabrique des Mondes</h1>
         <div class="head-button">
           <button class="selectMode menuButton">Edit mode</button>
           <button class="debugMode menuButton">Enabled debug mode</button>
@@ -68,35 +65,3 @@
     </div>
   </body>
 </html>
-
-<script> 
-document.addEventListener("DOMContentLoaded", function () {
-    // first popup
-    openPopup("Bienvenue à la Fabrique des Mondes, le seul endroit où tu peux créer des univers à ton image ! Nous sommes ravis de t'accueillir parmi nous et de t'avoir comme nouvel employé. ", "Suivant");
-});
-
-function openPopup( content, txtButton) {
-   
-    document.getElementById("popupContent").textContent = content;
-    document.querySelector(".popup-content button").textContent = txtButton;
-    document.getElementById("popup").style.display = "block";
-}
-
-function closePopup() {
-    // Hide actual popup
-    document.getElementById("popup").style.display = "none";
-}
-
-function openNewPopup() {
-    // Close actual popup
-    closePopup();
-
-    // New infos
-    openPopup("Bienvenue dans ton nouveau bureau ! Avec vue panoramique sur tes futures planètes ! Ici, l'imagination est la seule limite, et nous sommes impatients de voir les mondes incroyables que tu vas contribuer à fabriquer. N'hésite pas à explorer, créer et innover. Ton voyage commence maintenant, et nous sommes certains qu'il sera aussi passionnant que les mondes que tu vas concevoir 🌌🚀✨", "À toi de jouer !");
-
-    // Close button
-    document.querySelector(".popup-content button").addEventListener("click", closePopup);
-
-}
-
-</script>
