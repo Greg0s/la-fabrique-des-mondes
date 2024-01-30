@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import { saveScreenshot, Hitbox } from "/utils";
-import { createPreview, createAllPreviews } from "/utils/preview";
+import { createAllPreviews } from "/utils/preview";
 
 // MODULES
 import {
@@ -16,6 +16,7 @@ import {
 import { getAttractorParams } from "./utils/attractors";
 import BoidEnvironment from "./modules/boids";
 import { TSPRandomXZ, TSPRandomY } from "./utils/tools";
+import { firstPopUp } from "./utils";
 
 const selectableValues = [
   "tree",
@@ -248,6 +249,15 @@ function init() {
 
   // UI listeners
 
+  firstPopUp();
+  let lastModal = false;
+  document
+    .querySelector(".popup-content button")
+    .addEventListener("click", function () {
+      if (lastModal) mode = "edit";
+      lastModal = true;
+    });
+
   const setListeners = async () => {
     console.log("Building UI Listeners...");
     const getButtons = async () => {
@@ -322,17 +332,14 @@ function init() {
   };
   setListeners().then(() => console.log("Built UI Listeners."));
 
-  setTimeout(
-    async () => {
-      let result = await createAllPreviews(canvas, boidMesh);
-      previewScenes = result.previewScenes;
-      allPreviewScenes = result.allPreviewScenes;
-      previewRenderer = result.previewRenderer;
-      previewBoids = result.previewBoids;
-      console.log("Preview scenes loaded.");
-    },
-    2000
-  );
+  setTimeout(async () => {
+    let result = await createAllPreviews(canvas, boidMesh);
+    previewScenes = result.previewScenes;
+    allPreviewScenes = result.allPreviewScenes;
+    previewRenderer = result.previewRenderer;
+    previewBoids = result.previewBoids;
+    console.log("Preview scenes loaded.");
+  }, 2000);
 
   requestAnimationFrame(animate);
 
