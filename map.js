@@ -91,7 +91,7 @@ const objects = {
 
 /* ADDED PARAMS*/
 
-let mode = "edit";
+let mode = "view";
 let debugMode = true;
 
 let selectedObject = "attractor";
