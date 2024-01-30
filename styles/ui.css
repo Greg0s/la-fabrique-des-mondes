@@ -117,7 +117,7 @@ h1 {
 }
 
 .debugMode {
-  background-color: var(--color-pink);
+  background-color: var(--color-orange);
 }
 
 .selectMode {
@@ -229,11 +229,11 @@ h1 {
   left: 50%;
   transform: translate(-50%, -50%);
   background-image: url(../img/fabriquedemondes.png);
-  background-size: cover; 
+  background-size: cover;
   background-repeat: no-repeat;
   width: auto;
   height: auto;
-  min-width: 40%; 
+  min-width: 40%;
   min-height: 45%;
   padding: 20px;
   text-align: center;
