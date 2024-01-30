@@ -229,7 +229,7 @@ h1 {
   left: 50%;
   transform: translate(-50%, -50%);
   background-image: url(../img/fabriquedemondes.png);
-  background-size: contain; 
+  background-size: cover; 
   background-repeat: no-repeat;
   width: auto;
   height: auto;
