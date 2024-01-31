@@ -18,21 +18,15 @@ import BoidEnvironment from "./modules/boids";
 import { TSPRandomXZ, TSPRandomY } from "./utils/tools";
 import { firstPopUp } from "./utils";
 
-const selectableValues = [
-  "tree",
-  "sponge",
-  "attractor",
-  "fitness-landscape",
-  "tsp",
-  "boids",
-];
-
 let camera, mainScene, renderer;
 let currentPreviewScene;
 let canvas = document.getElementById("c");
 let plane, planeHitbox;
 let pointer,
   raycaster = false;
+let startTime = Date.now();
+let directionalLight;
+let lastSetLightIntensityTime = 0;
 
 // Preview
 let previewScenes, allPreviewScenes, previewRenderer, previewBoids;
@@ -215,9 +209,11 @@ function init() {
   const ambientLight = new THREE.AmbientLight(0x606060, 3);
   mainScene.add(ambientLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
+  directionalLight = new THREE.DirectionalLight(0xffffff, 1);
   directionalLight.position.set(1, 0.75, 0.5).normalize();
   mainScene.add(directionalLight);
+
+  setLightIntensity();
 
   renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -569,6 +565,29 @@ function previewRender() {
 
   console.log(`Animating ${currentPreviewScene.name}`);
   animatePV(currentPreviewScene);
+}
+
+function setLightIntensity() {
+  if (directionalLight) {
+    const currentTime = Date.now();
+    const elapsedTime = (currentTime - startTime) / 1000; // convert to seconds
+
+    // Duration of a day in s
+    const dayDuration = 60 * 5;
+    // Calculate the intensity based on a sinusoidal function
+    const intensity = 2 + 1.5 * Math.sin((elapsedTime / dayDuration) * Math.PI);
+
+    // Update the directional light intensity
+    directionalLight.intensity = intensity;
+    directionalLight.updateMatrixWorld(); // Ajoutez cette ligne
+    eventCounts++; // Update the view
+
+    const timeSinceLastExecution = currentTime - lastSetLightIntensityTime;
+    if (timeSinceLastExecution >= 2000) {
+      lastSetLightIntensityTime = currentTime;
+      setTimeout(setLightIntensity, 2000); // Planifie l'exécution après 2 secondes
+    }
+  }
 }
 
 function animate() {
