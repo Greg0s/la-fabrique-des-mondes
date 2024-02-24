@@ -6,5 +6,4 @@ theme: jekyll-theme-minimal
 
 # Specify directories to be included
 include:
-  - node_modules/
   - img/
