@@ -159,7 +159,7 @@ function init() {
   //Fond image
 
   const loader = new THREE.TextureLoader();
-  const texture = loader.load("/assets/fond.png", () => {
+  const texture = loader.load("./assets/fond.png", () => {
     texture.mapping = THREE.EquirectangularReflectionMapping;
     texture.colorSpace = THREE.SRGBColorSpace;
     mainScene.background = texture;

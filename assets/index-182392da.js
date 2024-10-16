@@ -46653,7 +46653,7 @@ function $L() {
     Hn.position.set(0, 800, 1300),
     Hn.lookAt(0, 0, 0),
     (kt = new Zp());
-  const e = new $w().load("/assets/fond.png", () => {
+  const e = new $w().load("/la-fabrique-des-mondes/assets/fond.png", () => {
       (e.mapping = Mo), (e.colorSpace = gt), (kt.background = e), mn++;
     }),
     t = new mt(50, 50, 50);
