@@ -1,7 +1,6 @@
-# ThreeTemplate
+# La fabrique des mondes
 
-With this template, you can easily create a project using Three.js.
-We use here the bundler Vite, and ESLint as the linter.
+Click here to see the project online : [greg0s.github.io/la-fabrique-des-mondes/](https://greg0s.github.io/la-fabrique-des-mondes/)
 
 ## Installation
 
